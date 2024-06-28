@@ -51,7 +51,6 @@ export default function SignIn() {
           "http://localhost:8080/auth/login",
           values
         );
-        localStorage.setItem("token", resp.data.token);
         setToken(resp.data.token);
         navigate("/");
         setIsLoading(false)

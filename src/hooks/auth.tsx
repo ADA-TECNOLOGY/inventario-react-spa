@@ -1,7 +1,6 @@
 import {
   createContext,
   useContext,
-  useEffect,
   useState,
 } from "react";
 
@@ -17,10 +16,12 @@ export const AuthProvider = ({ children }: any) => {
   const [data, setData] = useState<any | any>(localStorage.getItem("token") || "");
 
   const setToken = (token: string) => {
+    localStorage.setItem("token", token);
     setData(token);
   };
 
   const removeToken = () => {
+    localStorage.removeItem("token");
     setData(null);
   }
 

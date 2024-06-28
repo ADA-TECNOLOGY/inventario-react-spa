@@ -6,7 +6,6 @@ export default function Sidebar({ children }: any) {
   const {token} = useAuth();
   const isAuth = !!token;
 
-  console.log(!!token)
 
   return (
     <>
