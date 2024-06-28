@@ -10,12 +10,13 @@ interface Props {
 }
 
 const ProtectedRoute = ({ children }: Props) => {
-  const isAuth = localStorage.getItem("user") != undefined;
+  const isAuth = localStorage.getItem("token") != undefined;
   if (!isAuth) {
     return <Navigate to="/signin" replace />;
   }
   return children;
 };
+
 
 const RouteApp = () => {
   return (

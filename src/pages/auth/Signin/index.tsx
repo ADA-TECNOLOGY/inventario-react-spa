@@ -19,6 +19,7 @@ import { useCallback, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import * as yup from "yup";
+import { useAuth } from "../../../hooks/auth";
 
 type SignInFormData = {
   login: string;
@@ -33,6 +34,7 @@ const signInFormSchema = yup.object().shape({
 export default function SignIn() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const { setToken } = useAuth();
 
   const { register, handleSubmit, formState, setError } =
     useForm<SignInFormData>({
@@ -43,20 +45,22 @@ export default function SignIn() {
 
   const handleSignIn: SubmitHandler<SignInFormData> = useCallback(
     async (values) => {
+      setIsLoading(true)
       try {
         const resp = await axios.post(
           "http://localhost:8080/auth/login",
           values
         );
         localStorage.setItem("token", resp.data.token);
-        navigate("/home");
-        console.log(resp);
+        setToken(resp.data.token);
+        navigate("/");
+        setIsLoading(false)
       } catch (error) {
+        setIsLoading(false)
         setError("login", {}),
         setError("password", {
           message: "Email ou senha incorretos. Por favor, tente novamente."
         })
-        console.log(error)
       }
     },
     []
