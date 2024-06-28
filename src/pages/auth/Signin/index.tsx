@@ -14,6 +14,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
+import axios from "axios";
 import { useCallback, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -26,43 +27,37 @@ type SignInFormData = {
 
 const signInFormSchema = yup.object().shape({
   login: yup.string().required("Login obrigatório"),
-  password: yup
-    .string()
-    .required("Senha obrigatória")});
+  password: yup.string().required("Senha obrigatória"),
+});
 
 export default function SignIn() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
-  const { register, handleSubmit, formState, setError } = useForm<SignInFormData>({
-    resolver: yupResolver(signInFormSchema) as any,
-  });
+  const { register, handleSubmit, formState, setError } =
+    useForm<SignInFormData>({
+      resolver: yupResolver(signInFormSchema) as any,
+    });
 
   const { errors } = formState;
 
   const handleSignIn: SubmitHandler<SignInFormData> = useCallback(
     async (values) => {
-      console.log(values);
-      setIsLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      const { login, password } = values;
-
-      const data = {
-        login,
-        password,
-      };
-
-      if(data.login == 'admin' && data.password == '123456' ){
+      try {
+        const resp = await axios.post(
+          "http://localhost:8080/auth/login",
+          values
+        );
+        localStorage.setItem("token", resp.data.token);
         navigate("/home");
-      }else{
+        console.log(resp);
+      } catch (error) {
+        setError("login", {}),
         setError("password", {
-            message: "Email ou senha incorretos. Por favor, tente novamente."
+          message: "Email ou senha incorretos. Por favor, tente novamente."
         })
-        setError("login", {})
+        console.log(error)
       }
-      setIsLoading(false);
-     
     },
     []
   );
