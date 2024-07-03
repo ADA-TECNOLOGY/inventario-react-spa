@@ -17,6 +17,8 @@ export default function Sidebar({ children }: any) {
               pos="fixed"
               h="100%"
               zIndex={20}
+              display={{ base: "none", md: "block" }}
+
             >
               <Box
                 p={5}
@@ -33,10 +35,13 @@ export default function Sidebar({ children }: any) {
                   <Link p={2} href="#">
                     Saidas
                   </Link>
+                  <Link p={2} href="/supplier">
+                    Fornecedores
+                  </Link>
                 </Flex>
               </Box>
             </Box>
-            <Box ml={{ base: 0, md: "250px" }} p={4} flex="1">
+            <Box ml={{ base: "full", md: "240px" }} p={4} flex="1">
               {children}
             </Box>
           </Flex>
