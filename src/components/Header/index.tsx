@@ -27,7 +27,7 @@ export default function Header() {
   return (
     <>
       {isAuth && (
-        <Box bg={"teal"} w={"100%"} p={2} color={"white"}>
+        <Box bg={"teal"} position={'fixed'} w={"100%"} p={2} color={"white"}>
           <Flex>
             <Flex p="2" align={"center"}>
               {!isOpenSidebar && (

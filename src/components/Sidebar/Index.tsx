@@ -61,11 +61,12 @@ export default function Sidebar({ children }: any) {
           </Drawer>
 
           <Box flex="1">
-            <Header></Header>
+            <Header ></Header>
             <Container
               transition="margin-left 0.3s ease-in-out"
               ml={isOpenSidebar ? { base: 0, md: "340px" } : ""}
               maxW={isOpenSidebar ? "75%" : "85%"}
+              mt={20}
             >
               {children}
             </Container>
