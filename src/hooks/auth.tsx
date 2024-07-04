@@ -6,14 +6,17 @@ import {
 
 interface AuthContextData {
   token: object;
+  isOpenSidebar: boolean;
   setToken(token: string): void;
   removeToken(): void
+  handleOpenSidebar():void
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider = ({ children }: any) => {
   const [data, setData] = useState<any | any>(localStorage.getItem("token") || "");
+  const [openSidebar, setOpenSidebar] = useState<boolean>(true);
 
   const setToken = (token: string) => {
     localStorage.setItem("token", token);
@@ -25,8 +28,13 @@ export const AuthProvider = ({ children }: any) => {
     setData(null);
   }
 
+  const handleOpenSidebar = () => {
+    setOpenSidebar(!openSidebar);
+  }
+
+
   return (
-    <AuthContext.Provider value={{ token: data, setToken: setToken, removeToken: removeToken }}>
+    <AuthContext.Provider value={{ token: data, isOpenSidebar: openSidebar, setToken, removeToken, handleOpenSidebar }}>
       {children}
     </AuthContext.Provider>
   );

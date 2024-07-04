@@ -16,7 +16,7 @@ import { HamburgerIcon } from "@chakra-ui/icons";
 export default function Header() {
   const isAuth = localStorage.getItem("token") != undefined;
   const navigate = useNavigate();
-  const { removeToken } = useAuth();
+  const { removeToken, handleOpenSidebar, isOpenSidebar } = useAuth();
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -30,8 +30,17 @@ export default function Header() {
         <Box bg={"teal"} w={"100%"} p={2} color={"white"}>
           <Flex>
             <Flex p="2" align={"center"}>
-              <HamburgerIcon mr={5} fontSize={"20"} cursor={"pointer"} />
-              <Heading size={"md"}>Inventário</Heading>
+              {!isOpenSidebar && (
+                <>
+                  <HamburgerIcon
+                    mr={5}
+                    fontSize={"20"}
+                    cursor={"pointer"}
+                    onClick={handleOpenSidebar}
+                  />
+                  <Heading size={"md"}>Inventário</Heading>
+                </>
+              )}
             </Flex>
             <Spacer />
 

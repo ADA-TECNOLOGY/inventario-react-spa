@@ -11,7 +11,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 <BrowserRouter>
       <ChakraProvider>
         <AuthProvider>
-          <Header/>
           <Sidebar>
             <RouteApp/>
             {/* <StylesGlobal /> */}

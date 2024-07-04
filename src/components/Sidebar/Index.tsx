@@ -1,35 +1,52 @@
-import React from "react";
-import { Box, Flex, Link } from "@chakra-ui/react";
+import {
+  Box,
+  Container,
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerHeader,
+  DrawerOverlay,
+  Flex,
+  Heading,
+  Link,
+} from "@chakra-ui/react";
 import { useAuth } from "../../hooks/auth";
+import { HamburgerIcon } from "@chakra-ui/icons";
+import Header from "../Header";
 
 export default function Sidebar({ children }: any) {
-  const {token} = useAuth();
+  const { token, isOpenSidebar, handleOpenSidebar } = useAuth();
   const isAuth = !!token;
-
 
   return (
     <>
-      {isAuth && (
-        <Box>
-          <Flex>
-            <Box
-              w={{ base: "full", md: "240px" }}
-              pos="fixed"
-              h="100%"
-              zIndex={20}
-              display={{ base: "none", md: "block" }}
-
-            >
-              <Box
-                p={5}
-                w="100%"
-                h="100%"
-                bg={"white"}
-                color={"teal"}
-                boxShadow="lg"
+      {isAuth ? (
+        <Flex height="100vh">
+          <Drawer
+            placement="left"
+            onClose={handleOpenSidebar}
+            isOpen={isOpenSidebar}
+          >
+            <DrawerOverlay bg="transparent" />
+            <DrawerContent>
+              <DrawerHeader
+                borderBottomColor={"teal"}
+                bg={"teal"}
+                borderBottomWidth="8px"
               >
+                <Flex color={"#fff"}>
+                  <HamburgerIcon
+                    mr={5}
+                    fontSize={"20"}
+                    cursor={"pointer"}
+                    onClick={handleOpenSidebar}
+                  />
+                  <Heading size={"md"}>Inventário</Heading>
+                </Flex>
+              </DrawerHeader>
+              <DrawerBody>
                 <Flex direction="column" as="nav">
-                  <Link p={2} href="/home">
+                  <Link p={2} href="/">
                     Inicio
                   </Link>
                   <Link p={2} href="#">
@@ -39,19 +56,24 @@ export default function Sidebar({ children }: any) {
                     Fornecedores
                   </Link>
                 </Flex>
-              </Box>
-            </Box>
-            <Box ml={{ base: "full", md: "240px" }} p={4} flex="1">
+              </DrawerBody>
+            </DrawerContent>
+          </Drawer>
+
+          <Box flex="1">
+            <Header></Header>
+            <Container
+              transition="margin-left 0.3s ease-in-out"
+              ml={isOpenSidebar ? { base: 0, md: "340px" } : ""}
+              maxW={isOpenSidebar ? "75%" : "85%"}
+            >
               {children}
-            </Box>
-          </Flex>
-        </Box>
+            </Container>
+          </Box>
+        </Flex>
+      ) : (
+        <Box>{children}</Box>
       )}
-      { !isAuth &&
-          <Box>
-          {children}
-        </Box>
-      }
     </>
   );
 }
