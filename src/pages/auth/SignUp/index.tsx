@@ -17,19 +17,21 @@ import {
 } from "@chakra-ui/react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { SignUpFormData, signUpFormSchema } from "./formSchema";
 import InputMask from 'react-input-mask';
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 
 export default function SignUp() {
-  const { register, handleSubmit, formState } = useForm<SignUpFormData>({
+  const { register, handleSubmit, getValues, formState } = useForm<SignUpFormData>({
     resolver: yupResolver(signUpFormSchema) as any,
   });
 
   const [isLoading, setIsLoading] = useState(false);
-
+  const [uf, setUf] = useState<string[]>([]);
+  const [cities, setCities] = useState<string[]>([])
   const { errors } = formState;
 
   const handleSignUp: SubmitHandler<SignUpFormData> = useCallback(
@@ -40,6 +42,32 @@ export default function SignUp() {
         }, 2000);
         console.log(values)
     },  [])
+
+    //Funcao para trazer ufs
+    useEffect(() => {
+      const dataUf = async () => {
+        try {
+          const resp = await axios.get("http://localhost:8080/state");
+          const sortedUf = resp.data.sort(); //const criada para ordenar lista passando para o retorno da req.
+            setUf(sortedUf) // os estado retornando ja com a const de ordenacao
+        } catch(error) {
+          console.error("Error ao buscar UF", error)
+        }
+      }
+      dataUf()
+    }, [])
+
+    //Funcao para trazer as cidades ao clicar na UF
+    const handleCity = async () => {
+      const ufs = getValues().uf
+      try {
+        const resp = await axios.get(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${ufs}/municipios`);
+          const sortedCities = resp.data.sort((a:any, b:any) => a.nome.localeCompare(b.nome));
+          setCities(sortedCities);
+      } catch(error){
+        console.error("Error ao buscar Cidades")
+      }
+    }
 
   return (
     <Container maxW="container.md" mt="2%" mb="2%">
@@ -118,17 +146,30 @@ export default function SignUp() {
               </FormControl>
               <FormControl isInvalid={!!errors.cep}>
                 <FormLabel>UF</FormLabel>
-                <Select id="uf" {...register("uf")}  />
+                <Select onClick={handleCity} id="uf" {...register("uf")}  >
+                  <option></option>
+                  {uf.map((uf: any) => (
+                    <option key={uf.id} value={uf.acronym}>
+                      {uf.acronym}
+                    </option>
+                  ))}
+                </Select>
                 {errors.uf && (
                 <FormErrorMessage>{errors.uf.message}</FormErrorMessage>
               )}
               </FormControl>
               <FormControl isInvalid={!!errors.cep} >
                 <FormLabel>Cidade</FormLabel>
-                <Select id="cidade"  {...register("cidade")} />
+                <Select id="cidade"  {...register("cidade")} >
+                  <option></option>{cities.map((citie: any) => (
+                    <option key={citie.id} value={citie.nome}>
+                      {citie.nome}
+                    </option>
+                  ))}
                 {errors.cidade && (
                 <FormErrorMessage>{errors.cidade.message}</FormErrorMessage>
               )}
+              </Select>
               </FormControl>
             </SimpleGrid>
             <SimpleGrid columns={1} mt={2}>
