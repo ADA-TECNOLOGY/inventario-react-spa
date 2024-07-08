@@ -52,6 +52,9 @@ export default function Sidebar({ children }: any) {
                   <Link p={2} href="#">
                     Saidas
                   </Link>
+                  <Link p={2} href="/supplier">
+                    Fornecedores
+                  </Link>
                 </Flex>
               </DrawerBody>
             </DrawerContent>
