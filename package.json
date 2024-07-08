@@ -25,6 +25,7 @@
     "react-icons": "^5.2.1",
     "react-input-mask": "^2.0.4",
     "react-router-dom": "^6.23.1",
+    "sweetalert2": "^11.12.1",
     "yup": "^0.32.9"
   },
   "devDependencies": {
