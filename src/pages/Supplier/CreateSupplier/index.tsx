@@ -1,5 +1,8 @@
 import {
   Box,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
   Button,
   Card,
   CardBody,
@@ -23,11 +26,13 @@ import { useCallback, useEffect, useState } from "react";
 import InputMask from "react-input-mask";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { ChevronRightIcon } from "@chakra-ui/icons";
 
 export default function CreateSupplier() {
-  const { register, handleSubmit, formState, getValues } = useForm<createSupplierData>({
-    resolver: yupResolver(createSupplierFormSchema) as any,
-  });
+  const { register, handleSubmit, formState, getValues } =
+    useForm<createSupplierData>({
+      resolver: yupResolver(createSupplierFormSchema) as any,
+    });
 
   const [isLoading, setIsLoading] = useState(false);
   const [ufs, setUfs] = useState<string[]>([]);
@@ -68,22 +73,31 @@ export default function CreateSupplier() {
   }, []);
 
   const handleCity = async () => {
-      const uf = getValues().uf
-      try {
-        const resp = await axios
-          .get(
-            `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`
-          );
-          const sortedCities = resp.data.sort((a:any, b:any) => a.nome.localeCompare(b.nome));
-          setCities(sortedCities);
-      } catch(error){
-        console.error("Error ao buscar Cidade", error);
-      }
-  }
-
+    const uf = getValues().uf;
+    try {
+      const resp = await axios.get(
+        `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`
+      );
+      const sortedCities = resp.data.sort((a: any, b: any) =>
+        a.nome.localeCompare(b.nome)
+      );
+      setCities(sortedCities);
+    } catch (error) {
+      console.error("Error ao buscar Cidade", error);
+    }
+  };
 
   return (
     <Container maxW="container.lg" mt="5%" mb="2%">
+      <Breadcrumb spacing='8px' separator={<ChevronRightIcon color='gray.500' />}>
+  <BreadcrumbItem>
+    <BreadcrumbLink href='/supplier'>Fornecedores</BreadcrumbLink>
+  </BreadcrumbItem>
+
+  <BreadcrumbItem>
+    <BreadcrumbLink href='/create'>Cadastro</BreadcrumbLink>
+  </BreadcrumbItem>
+  </Breadcrumb>
       <Card>
         <CardBody textAlign={"center"}>
           <Box as="form" onSubmit={handleSubmit(handleCreateSupplier)} mt="5">
@@ -213,8 +227,8 @@ export default function CreateSupplier() {
               </FormControl>
               <FormControl isInvalid={!!errors.cidade}>
                 <FormLabel>Cidade</FormLabel>
-                <Select  id="cidade" {...register("cidade")} >
-                <option></option>
+                <Select id="cidade" {...register("cidade")}>
+                  <option></option>
                   {cities.map((citie: any) => (
                     <option key={citie.id} value={citie.nome}>
                       {citie.nome}
@@ -225,7 +239,6 @@ export default function CreateSupplier() {
                   <FormErrorMessage>{errors.cidade.message}</FormErrorMessage>
                 )}
               </FormControl>
-              
             </SimpleGrid>
             <SimpleGrid mt={3}>
               <FormControl>
