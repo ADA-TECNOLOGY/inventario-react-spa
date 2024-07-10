@@ -8,35 +8,37 @@ export const signUpFormSchema = yup.object().shape({
       /^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}\-?\d{2}$/,
       "Formato de CNPJ inválido"
     ),
-  nomeFantasia: yup.string().required("Campo obrigatório"),
+  corporateName: yup.string().required("Campo obrigatório"), //razaoSocial
+  tradeName: yup.string().required("Campo obrigatório"), //nomeFantasia
   email: yup.string().required("Campo obrigatório").email("E-mail inválido"),
-  fone: yup.string().required("Campo obrigatório"),
-  endereco: yup.string().required("Campo obrigatório"),
-  numero: yup.string().required("Campo obrigatório"),
-  cep: yup.string().required("Campo obrigatório"),
-  uf: yup.string().required("Campo obrigatório"),
-  cidade: yup.string().required("Campo obrigatório"),
-  senha: yup
+  phone: yup.string().required("Campo obrigatório"),
+  address: yup.string().required("Campo obrigatório"),
+  number: yup.string().required("Campo obrigatório"),
+  postalCode: yup.string().required("Campo obrigatório"),
+  state: yup.string().required("Campo obrigatório"),
+  city: yup.string().required("Campo obrigatório"),
+  password: yup
     .string()
     .required("Campo obrigatório")
     .min(6, "Senha deve ter no mínimo 6 caracteres"),
-  confirmarSenha: yup
+  confirmPassword: yup
     .string()
     .required("Campo obrigatório")
-    .oneOf([yup.ref("senha"), null], "Senhas não conferem"),
+    .oneOf([yup.ref("password"), null], "Senhas não conferem"),
 });
 
 export type SignUpFormData = {
   cnpj: number;
-  nomeFantasia: string;
+  corporateName: string;
+  tradeName: string;
   email: string;
-  fone: string;
-  endereco: string;
-  numero: number;
-  cep: number;
-  uf: string;
-  cidade: string;
-  complemento: string;
-  senha: string;
-  confirmarSenha: string;
+  phone: string;
+  address: string;
+  number: number;
+  postalCode: number;
+  state: string;
+  city: string;
+  complement: string;
+  password: string;
+  confirmPassword: string;
 };

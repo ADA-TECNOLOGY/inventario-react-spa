@@ -22,6 +22,7 @@ import { SignUpFormData, signUpFormSchema } from "./formSchema";
 import InputMask from 'react-input-mask';
 import { Link } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 
 export default function SignUp() {
@@ -34,12 +35,35 @@ export default function SignUp() {
   const [cities, setCities] = useState<string[]>([])
   const { errors } = formState;
 
+   //Funcao para salvar empresa (post)
   const handleSignUp: SubmitHandler<SignUpFormData> = useCallback(
     async (values) => {
         setIsLoading(true)
-        setTimeout(() => {
-            setIsLoading(false)
-        }, 2000);
+        try{
+          await axios.post("http://localhost:8080/company", values)
+          Swal.fire({
+            title: "Sucesso!",
+            text: "Em alguns instantes você recebera um e-mail de confirmação da sua conta",
+            icon: "success"
+          });
+        } catch(error: any) {
+          const data = error.response.data;
+          if(data.details){
+            Swal.fire({
+              icon: "warning",
+              title: "Alerta",
+              text: `${data.details}`,
+            });
+          }else{
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: `${error?.message}`,
+            });
+          }
+          
+        }
+        setIsLoading(false)
         console.log(values)
     },  [])
 
@@ -59,7 +83,7 @@ export default function SignUp() {
 
     //Funcao para trazer as cidades ao clicar na UF
     const handleCity = async () => {
-      const ufs = getValues().uf
+      const ufs = getValues().state
       try {
         const resp = await axios.get(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${ufs}/municipios`);
           const sortedCities = resp.data.sort((a:any, b:any) => a.nome.localeCompare(b.nome));
@@ -80,21 +104,40 @@ export default function SignUp() {
             Cadastrar uma conta
           </Text>
           <Box as="form" onSubmit={handleSubmit(handleSignUp)} mt="5">
-            <SimpleGrid columns={1} spacing={2}>
-              <FormControl isInvalid={!!errors.cnpj}>
+              <SimpleGrid
+              mt={2}
+              columns={2}
+              spacing={5}
+              templateColumns="4fr 4fr"
+            >
+              <FormControl isInvalid={!!errors.corporateName}>
+                <FormLabel>Razão Social</FormLabel>
+                <Input id="corporateName" {...register("corporateName")} />
+                {errors.corporateName && (
+                <FormErrorMessage>{errors.corporateName.message}</FormErrorMessage>
+              )}
+              </FormControl>
+              <FormControl isInvalid={!!errors.tradeName}>
+                <FormLabel>Nome Fantasia</FormLabel>
+                <Input id="tradeName" {...register("tradeName")} />
+                {errors.tradeName && (
+                <FormErrorMessage>{errors.tradeName.message}</FormErrorMessage>
+              )}
+              </FormControl>
+              </SimpleGrid>
+              <FormControl mt={2} isInvalid={!!errors.cnpj}>
                 <FormLabel>CNPJ</FormLabel>
                 <Input as={InputMask} mask='**.***.***/****-**' id="cnpj" {...register("cnpj")} />
                 {errors.cnpj && (
                 <FormErrorMessage>{errors.cnpj.message}</FormErrorMessage>
               )}
               </FormControl>
-              <FormControl isInvalid={!!errors.nomeFantasia}>
-                <FormLabel>Nome Fantasia</FormLabel>
-                <Input id="nomeFantasia" {...register("nomeFantasia")} />
-                {errors.nomeFantasia && (
-                <FormErrorMessage>{errors.nomeFantasia.message}</FormErrorMessage>
-              )}
-              </FormControl>
+              <SimpleGrid
+              mt={2}
+              columns={2}
+              spacing={5}
+              templateColumns="3fr 1fr"
+            >
               <FormControl isInvalid={!!errors.email}>
                 <FormLabel>E-mail</FormLabel>
                 <Input id="email" {...register("email")} />
@@ -102,32 +145,32 @@ export default function SignUp() {
                 <FormErrorMessage>{errors.email.message}</FormErrorMessage>
               )}
               </FormControl>
-              <FormControl isInvalid={!!errors.fone}>
+              <FormControl isInvalid={!!errors.phone}>
                 <FormLabel>Fone</FormLabel>
-                <Input as={InputMask} mask='(**) *****-****' type='tel' id="fone"  {...register("fone")} />
-                {errors.fone && (
-                <FormErrorMessage>{errors.fone.message}</FormErrorMessage>
+                <Input as={InputMask} mask='(**) *****-****' type='tel' id="phone"  {...register("phone")} />
+                {errors.phone && (
+                <FormErrorMessage>{errors.phone.message}</FormErrorMessage>
               )}
               </FormControl>
-            </SimpleGrid>
+              </SimpleGrid>
             <SimpleGrid
               mt={2}
               columns={2}
               spacing={5}
               templateColumns="3fr 1fr"
             >
-              <FormControl isInvalid={!!errors.endereco}>
+              <FormControl isInvalid={!!errors.address}>
                 <FormLabel>Endereço</FormLabel>
-                <Input id="endereco"  {...register("endereco")} />
-                {errors.endereco && (
-                <FormErrorMessage>{errors.endereco.message}</FormErrorMessage>
+                <Input id="address"  {...register("address")} />
+                {errors.address && (
+                <FormErrorMessage>{errors.address.message}</FormErrorMessage>
               )}
               </FormControl>
-              <FormControl isInvalid={!!errors.numero}>
+              <FormControl isInvalid={!!errors.number}>
                 <FormLabel>Número</FormLabel>
-                <Input id="numero"  {...register("numero")} />
-                {errors.numero && (
-                <FormErrorMessage>{errors.numero.message}</FormErrorMessage>
+                <Input id="number"  {...register("number")} />
+                {errors.number && (
+                <FormErrorMessage>{errors.number.message}</FormErrorMessage>
               )}
               </FormControl>
             </SimpleGrid>
@@ -137,47 +180,47 @@ export default function SignUp() {
               spacing={5}
               templateColumns="3fr 1fr 3fr"
             >
-              <FormControl isInvalid={!!errors.cep}>
+              <FormControl isInvalid={!!errors.postalCode}>
                 <FormLabel>Cep</FormLabel>
-                <Input as={InputMask} mask='**.***-***' id="cep"  {...register("cep")} />
-                {errors.cep && (
-                <FormErrorMessage>{errors.cep.message}</FormErrorMessage>
+                <Input as={InputMask} mask='**.***-***' id="postalCode"  {...register("postalCode")} />
+                {errors.postalCode && (
+                <FormErrorMessage>{errors.postalCode.message}</FormErrorMessage>
               )}
               </FormControl>
-              <FormControl isInvalid={!!errors.cep}>
+              <FormControl isInvalid={!!errors.state}>
                 <FormLabel>UF</FormLabel>
-                <Select onClick={handleCity} id="uf" {...register("uf")}  >
+                <Select onClick={handleCity} id="state" {...register("state")}  >
                   <option></option>
-                  {uf.map((uf: any) => (
-                    <option key={uf.id} value={uf.acronym}>
-                      {uf.acronym}
+                  {uf.map((state: any) => (
+                    <option key={state.id} value={state.acronym}>
+                      {state.acronym}
                     </option>
                   ))}
                 </Select>
-                {errors.uf && (
-                <FormErrorMessage>{errors.uf.message}</FormErrorMessage>
+                {errors.state && (
+                <FormErrorMessage>{errors.state.message}</FormErrorMessage>
               )}
               </FormControl>
-              <FormControl isInvalid={!!errors.cep} >
+              <FormControl isInvalid={!!errors.city} >
                 <FormLabel>Cidade</FormLabel>
-                <Select id="cidade"  {...register("cidade")} >
+                <Select id="city"  {...register("city")} >
                   <option></option>{cities.map((citie: any) => (
                     <option key={citie.id} value={citie.nome}>
                       {citie.nome}
                     </option>
                   ))}
-                {errors.cidade && (
-                <FormErrorMessage>{errors.cidade.message}</FormErrorMessage>
+                {errors.city && (
+                <FormErrorMessage>{errors.city.message}</FormErrorMessage>
               )}
               </Select>
               </FormControl>
             </SimpleGrid>
             <SimpleGrid columns={1} mt={2}>
-              <FormControl isInvalid={!!errors.complemento}>
+              <FormControl>
                 <FormLabel>Complemento</FormLabel>
-                <Input id="complemento"  {...register("complemento")} />
-                {errors.complemento && (
-                <FormErrorMessage>{errors.complemento.message}</FormErrorMessage>
+                <Input id="complement"  {...register("complement")} />
+                {errors.complement && (
+                <FormErrorMessage>{errors.complement.message}</FormErrorMessage>
               )}
               </FormControl>
             </SimpleGrid>
@@ -187,18 +230,18 @@ export default function SignUp() {
               spacing={5}
               templateColumns="2fr 2fr"
             >
-              <FormControl isInvalid={!!errors.senha}>
+              <FormControl isInvalid={!!errors.password}>
                 <FormLabel>Senha</FormLabel>
-                <Input type="password" id="senha"  {...register("senha")} />
-                {errors.senha && (
-                <FormErrorMessage>{errors.senha.message}</FormErrorMessage>
+                <Input type="password" id="password"  {...register("password")} />
+                {errors.password && (
+                <FormErrorMessage>{errors.password.message}</FormErrorMessage>
               )}
               </FormControl>
-              <FormControl isInvalid={!!errors.confirmarSenha}>
+              <FormControl isInvalid={!!errors.confirmPassword}>
                 <FormLabel>Confirmar Senha</FormLabel>
-                <Input type="password" id="confirmarSenha"  {...register("confirmarSenha")} />
-                {errors.confirmarSenha && (
-                <FormErrorMessage>{errors.confirmarSenha.message}</FormErrorMessage>
+                <Input type="password" id="confirmPassword"  {...register("confirmPassword")} />
+                {errors.confirmPassword && (
+                <FormErrorMessage>{errors.confirmPassword.message}</FormErrorMessage>
               )}
               </FormControl>
             </SimpleGrid>
