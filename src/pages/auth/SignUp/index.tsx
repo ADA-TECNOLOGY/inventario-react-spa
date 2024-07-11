@@ -11,28 +11,32 @@ import {
   FormLabel,
   Heading,
   Input,
+  Radio,
+  RadioGroup,
   Select,
   SimpleGrid,
+  Stack,
   Text,
 } from "@chakra-ui/react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { Controller, set, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useCallback, useEffect, useState } from "react";
 import { SignUpFormData, signUpFormSchema } from "./formSchema";
 import InputMask from 'react-input-mask';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 
 
 export default function SignUp() {
-  const { register, handleSubmit, getValues, formState } = useForm<SignUpFormData>({
+  const { register, control, handleSubmit, getValues, formState } = useForm<SignUpFormData>({
     resolver: yupResolver(signUpFormSchema) as any,
   });
-
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [uf, setUf] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([])
+  const [typeDocument, setTypeDocument] = useState("cnpj");
   const { errors } = formState;
 
    //Funcao para salvar empresa (post)
@@ -44,8 +48,12 @@ export default function SignUp() {
           Swal.fire({
             title: "Sucesso!",
             text: "Em alguns instantes você recebera um e-mail de confirmação da sua conta",
-            icon: "success"
+            icon: "success",
+            timer: 3000
           });
+          setTimeout(() => {
+            navigate("/signin");
+          }, 3000);
         } catch(error: any) {
           const data = error.response.data;
           if(data.details){
@@ -61,10 +69,9 @@ export default function SignUp() {
               text: `${error?.message}`,
             });
           }
-          
+          setIsLoading(false)
         }
-        setIsLoading(false)
-        console.log(values)
+       
     },  [])
 
     //Funcao para trazer ufs
@@ -93,6 +100,10 @@ export default function SignUp() {
       }
     }
 
+    //Funcao para atualizar o estado typedocument com novo valor
+    const handleTypeDocumentChange = (value:any) => {
+      setTypeDocument(value)
+    }
   return (
     <Container maxW="container.md" mt="2%" mb="2%">
       <Card>
@@ -107,7 +118,7 @@ export default function SignUp() {
               <SimpleGrid
               mt={2}
               columns={2}
-              spacing={5}
+              spacing={3}
               templateColumns="4fr 4fr"
             >
               <FormControl isInvalid={!!errors.corporateName}>
@@ -125,19 +136,37 @@ export default function SignUp() {
               )}
               </FormControl>
               </SimpleGrid>
-              <FormControl mt={2} isInvalid={!!errors.cnpj}>
-                <FormLabel>CNPJ</FormLabel>
-                <Input as={InputMask} mask='**.***.***/****-**' id="cnpj" {...register("cnpj")} />
-                {errors.cnpj && (
-                <FormErrorMessage>{errors.cnpj.message}</FormErrorMessage>
-              )}
-              </FormControl>
               <SimpleGrid
               mt={2}
-              columns={2}
-              spacing={5}
-              templateColumns="3fr 1fr"
+              columns={4}
+              spacing={3}
+              templateColumns="1fr 2fr 3fr 2fr"
             >
+              <RadioGroup mt={9} value={typeDocument} onChange={handleTypeDocumentChange}>
+                <Stack direction="row">
+                  <Radio value="cnpj">CNPJ</Radio>
+                  <Radio value="cpf">CPF</Radio>
+                </Stack>
+              </RadioGroup>
+              <FormControl isInvalid={!!errors.cnpj}>
+                <FormLabel>{typeDocument === "cnpj" ? "CNPJ" : "CPF"}</FormLabel>
+                <Controller
+                  name="cnpj"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      as={InputMask}
+                      mask={typeDocument === "cnpj" ? "99.999.999/9999-99" : "999.999.999-99"}
+                      id="cnpj"
+                      {...field}
+                    />
+                  )}
+                />
+                {errors.cnpj && (
+                  <FormErrorMessage>{errors.cnpj.message}</FormErrorMessage>
+                )}
+        
+              </FormControl>
               <FormControl isInvalid={!!errors.email}>
                 <FormLabel>E-mail</FormLabel>
                 <Input id="email" {...register("email")} />
@@ -156,9 +185,16 @@ export default function SignUp() {
             <SimpleGrid
               mt={2}
               columns={2}
-              spacing={5}
-              templateColumns="3fr 1fr"
+              spacing={3}
+              templateColumns="1fr 4fr"
             >
+              <FormControl isInvalid={!!errors.postalCode}>
+                <FormLabel>Cep</FormLabel>
+                <Input as={InputMask} mask='**.***-***' id="postalCode"  {...register("postalCode")} />
+                {errors.postalCode && (
+                <FormErrorMessage>{errors.postalCode.message}</FormErrorMessage>
+              )}
+              </FormControl>
               <FormControl isInvalid={!!errors.address}>
                 <FormLabel>Endereço</FormLabel>
                 <Input id="address"  {...register("address")} />
@@ -166,25 +202,18 @@ export default function SignUp() {
                 <FormErrorMessage>{errors.address.message}</FormErrorMessage>
               )}
               </FormControl>
+            </SimpleGrid>
+            <SimpleGrid
+              mt={2}
+              columns={3}
+              spacing={3}
+              templateColumns="1fr 1fr 3fr"
+            >
               <FormControl isInvalid={!!errors.number}>
                 <FormLabel>Número</FormLabel>
                 <Input id="number"  {...register("number")} />
                 {errors.number && (
                 <FormErrorMessage>{errors.number.message}</FormErrorMessage>
-              )}
-              </FormControl>
-            </SimpleGrid>
-            <SimpleGrid
-              mt={2}
-              columns={3}
-              spacing={5}
-              templateColumns="3fr 1fr 3fr"
-            >
-              <FormControl isInvalid={!!errors.postalCode}>
-                <FormLabel>Cep</FormLabel>
-                <Input as={InputMask} mask='**.***-***' id="postalCode"  {...register("postalCode")} />
-                {errors.postalCode && (
-                <FormErrorMessage>{errors.postalCode.message}</FormErrorMessage>
               )}
               </FormControl>
               <FormControl isInvalid={!!errors.state}>
@@ -227,7 +256,7 @@ export default function SignUp() {
             <SimpleGrid
               mt={2}
               columns={2}
-              spacing={5}
+              spacing={3}
               templateColumns="2fr 2fr"
             >
               <FormControl isInvalid={!!errors.password}>

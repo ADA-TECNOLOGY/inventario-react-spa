@@ -1,5 +1,8 @@
 import {
   Box,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
   Button,
   Card,
   CardBody,
@@ -16,28 +19,31 @@ import {
   Stack,
   Textarea,
 } from "@chakra-ui/react";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup"; // esquema de validacao
+import { Controller, SubmitHandler, useForm } from "react-hook-form"; // Hooks e funções do react-hook-form para gerenciamento de formulários.
 import { createSupplierData, createSupplierFormSchema } from "./formSchema";
 import { useCallback, useEffect, useState } from "react";
 import InputMask from "react-input-mask";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 export default function CreateSupplier() {
-  const { register, handleSubmit, formState, getValues } = useForm<createSupplierData>({
-    resolver: yupResolver(createSupplierFormSchema) as any,
-  });
+  const { register, control, handleSubmit, formState, getValues } =
+    useForm<createSupplierData>({
+      resolver: yupResolver(createSupplierFormSchema) as any,
+    });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [ufs, setUfs] = useState<string[]>([]);
-  const [cities, setCities] = useState<string[]>([]);
+  const [ufs, setUfs] = useState<any>([]);
+  const [cities, setCities] = useState<any>([]);
+  const [typeDocument, setTypeDocument] = useState("cnpj");
   const { errors } = formState;
 
+  //Salva o dados do fornecedor
   const handleCreateSupplier: SubmitHandler<createSupplierData> = useCallback(
     async (values) => {
-      setIsLoading(true);
-
+      setIsLoading(true); //inicia o estado(como true)
       setTimeout(() => {
         setIsLoading(false);
         console.log(values);
@@ -53,38 +59,55 @@ export default function CreateSupplier() {
     []
   );
 
+  //usada para buscar ums lista de estado por UF de uma API
   useEffect(() => {
     const dataState = async () => {
       try {
-        const resp = await axios.get("http://localhost:8080/state");
-        const sortUfs = resp.data.sort();
-        setUfs(sortUfs);
-        setUfs(resp.data);
+        const resp = await axios.get("http://localhost:8080/state"); //faz a requisicao
+        const sortUfs = resp.data.sort(); //ordena os estados recebidos
+        setUfs(sortUfs); // Armazena os estados ordenados no estado 'ufs'
+        setUfs(resp.data); 
       } catch (error) {
-        console.error("Error ao buscar UF", error);
+        console.error("Error ao buscar UF", error); // Captura e exibe um erro no console, caso ocorra
       }
     };
-    dataState();
+    dataState(); // Chama a função para buscar os estados
   }, []);
 
+  //busca uma lista de cidades usando a API do IBGE(conforme a uf selecionada)
   const handleCity = async () => {
-      const uf = getValues().uf
-      try {
-        const resp = await axios
-          .get(
-            `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`
-          );
-          const sortedCities = resp.data.sort((a:any, b:any) => a.nome.localeCompare(b.nome));
-          setCities(sortedCities);
-      } catch(error){
-        console.error("Error ao buscar Cidade", error);
-      }
-  }
+    const uf = getValues().uf; //obtem o valor da UF selecionada no campo
+    try {
+      // Faz uma requisição GET para a API do IBGE para buscar as cidades da UF selecionada
+      const resp = await axios.get(
+        `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`
+      );
+      const sortedCities = resp.data.sort((a: any, b: any) => // Ordena as cidades pelo nome
+        a.nome.localeCompare(b.nome)
+      );
+      setCities(sortedCities);   // Atualiza o estado 'cities' com a lista de cidades ordenadas
+    } catch (error) {
+       // Captura e exibe um erro no console, caso ocorra
+      console.error("Error ao buscar Cidade", error);
+    }
+  };
 
+  //usada para atualizar o estado typeDocument com um novo valor
+  const handleTypeDocumentChange = (value:any) => {
+    setTypeDocument(value)
+  };
 
   return (
-    <Container maxW="container.lg" mt="5%" mb="2%">
-      <Card>
+    <Container maxW="container.lg" mb="2%">
+      <Breadcrumb fontWeight="medium" fontSize="lg">
+        <BreadcrumbItem>
+          <BreadcrumbLink as={Link} to="/supplier">Fornecedores</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbItem isCurrentPage>
+          <BreadcrumbLink color={"teal"}>Cadastro</BreadcrumbLink>
+        </BreadcrumbItem>
+      </Breadcrumb>
+      <Card mt={5}>
         <CardBody textAlign={"center"}>
           <Box as="form" onSubmit={handleSubmit(handleCreateSupplier)} mt="5">
             <SimpleGrid
@@ -119,19 +142,25 @@ export default function CreateSupplier() {
               spacing={5}
               templateColumns="1fr 5fr 3fr"
             >
-              <RadioGroup mt={6} defaultValue="1">
+              <RadioGroup mt={6} value={typeDocument} onChange={handleTypeDocumentChange}>
                 <Stack direction="row">
-                  <Radio value="1">CNPJ</Radio>
-                  <Radio value="2">CPF</Radio>
+                  <Radio value="cnpj">CNPJ</Radio>
+                  <Radio value="cpf">CPF</Radio>
                 </Stack>
               </RadioGroup>
               <FormControl isInvalid={!!errors.cnpj}>
-                <FormLabel>CNPJ/CPF</FormLabel>
-                <Input
-                  as={InputMask}
-                  mask="**.***.***/****-**"
-                  id="cnpj"
-                  {...register("cnpj")}
+                <FormLabel>{typeDocument === "cnpj" ? "CNPJ" : "CPF"}</FormLabel>
+                <Controller
+                  name="cnpj"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      as={InputMask}
+                      mask={typeDocument === "cnpj" ? "99.999.999/9999-99" : "999.999.999-99"}
+                      id="cnpj"
+                      {...field}
+                    />
+                  )}
                 />
                 {errors.cnpj && (
                   <FormErrorMessage>{errors.cnpj.message}</FormErrorMessage>
@@ -213,8 +242,8 @@ export default function CreateSupplier() {
               </FormControl>
               <FormControl isInvalid={!!errors.cidade}>
                 <FormLabel>Cidade</FormLabel>
-                <Select  id="cidade" {...register("cidade")} >
-                <option></option>
+                <Select id="cidade" {...register("cidade")}>
+                  <option></option>
                   {cities.map((citie: any) => (
                     <option key={citie.id} value={citie.nome}>
                       {citie.nome}
@@ -225,7 +254,6 @@ export default function CreateSupplier() {
                   <FormErrorMessage>{errors.cidade.message}</FormErrorMessage>
                 )}
               </FormControl>
-              
             </SimpleGrid>
             <SimpleGrid mt={3}>
               <FormControl>
