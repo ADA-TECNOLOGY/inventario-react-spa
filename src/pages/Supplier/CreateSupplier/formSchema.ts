@@ -8,30 +8,35 @@ export const createSupplierFormSchema = yup.object().shape({
       /^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}\-?\d{2}$/,
       "Formato de CNPJ inválido"
     ),
-  razaoSocial: yup.string().required("Campo obrigatório"),
-  nomeFantasia: yup.string().required("Campo obrigatório"),
+  corporateName: yup.string().required("Campo obrigatório"),
+  tradeName: yup.string().required("Campo obrigatório"),
   email: yup.string().required("Campo obrigatório").email("E-mail inválido"),
-  fone: yup.string().required("Campo obrigatório"),
-  cep: yup.string().required("Campo obrigatório"),
-  endereco: yup.string().required("Campo obrigatório"),
-  numero: yup.string().required("Campo obrigatório"),
-  bairro: yup.string().required("Campo obrigatório"),
-  // cidade: yup.string().required("Campo obrigatório"),
-  // uf: yup.string().required("Campo obrigatório"),
+  phone: yup.string().required("Campo obrigatório"),
+  address: yup.object().shape({
+    postalCode: yup.string().required("Campo obrigatório"),
+    street: yup.string().required("Campo obrigatório"),
+    number: yup.string().required("Campo obrigatório"),
+    district: yup.string().required("Campo obrigatório"),
+    city: yup.string().required("Campo obrigatório"),
+    state: yup.string().required("Campo obrigatório"),
+  })
+  
 });
 
-export type createSupplierData = {
-  cnpj: number;
-  razaoSocial: string;
-  nomeFantasia: string;
+export interface Address {
+  postalCode: string;
+  street: string;
+  number: string;
+  district: string;
+  city: string;
+  state: string;
+}
+
+export interface CreateSupplierFormData {
+  cnpj: string;
+  corporateName: string;
+  tradeName: string;
   email: string;
-  fone: string;
-  cep: number;
-  endereco: string;
-  numero: number;
-  bairro: string;
-  cidade: string;
-  uf: string;
-  complemento: string;
-  observacao: string;
-};
+  phone: string;
+  address: Address;
+}
