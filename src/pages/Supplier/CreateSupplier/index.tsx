@@ -12,7 +12,7 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
-  Radio,
+  Radio, 
   RadioGroup,
   Select,
   SimpleGrid,
@@ -21,7 +21,7 @@ import {
 } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup"; // esquema de validacao
 import { Controller, SubmitHandler, useForm } from "react-hook-form"; // Hooks e funções do react-hook-form para gerenciamento de formulários.
-import { createSupplierData, createSupplierFormSchema } from "./formSchema";
+import { CreateSupplierFormData, createSupplierFormSchema } from "./formSchema";
 import { useCallback, useEffect, useState } from "react";
 import InputMask from "react-input-mask";
 import Swal from "sweetalert2";
@@ -29,8 +29,8 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 
 export default function CreateSupplier() {
-  const { register, control, handleSubmit, formState, getValues } =
-    useForm<createSupplierData>({
+  const { register, control, handleSubmit, formState, getValues, setValue } =
+    useForm<CreateSupplierFormData>({
       resolver: yupResolver(createSupplierFormSchema) as any,
     });
 
@@ -41,7 +41,7 @@ export default function CreateSupplier() {
   const { errors } = formState;
 
   //Salva o dados do fornecedor
-  const handleCreateSupplier: SubmitHandler<createSupplierData> = useCallback(
+  const handleCreateSupplier: SubmitHandler<CreateSupplierFormData> = useCallback(
     async (values) => {
       setIsLoading(true); //inicia o estado(como true)
       setTimeout(() => {
@@ -60,27 +60,30 @@ export default function CreateSupplier() {
   );
 
   //usada para buscar ums lista de estado por UF de uma API
+  const dataState = async () => {
+    try {
+      const resp = await axios.get("http://localhost:8080/state"); //faz a requisicao
+      const sortUfs = resp.data.sort(); //ordena os estados recebidos
+      setUfs(sortUfs); // Armazena os estados ordenados no estado 'ufs'
+      setUfs(resp.data); 
+    } catch (error) {
+      console.error("Error ao buscar UF", error); // Captura e exibe um erro no console, caso ocorra
+    }
+  };
+  
+
   useEffect(() => {
-    const dataState = async () => {
-      try {
-        const resp = await axios.get("http://localhost:8080/state"); //faz a requisicao
-        const sortUfs = resp.data.sort(); //ordena os estados recebidos
-        setUfs(sortUfs); // Armazena os estados ordenados no estado 'ufs'
-        setUfs(resp.data); 
-      } catch (error) {
-        console.error("Error ao buscar UF", error); // Captura e exibe um erro no console, caso ocorra
-      }
-    };
     dataState(); // Chama a função para buscar os estados
-  }, []);
+     setValue("address.city", getValues().address.city)
+  }, [cities]);
 
   //busca uma lista de cidades usando a API do IBGE(conforme a uf selecionada)
   const handleCity = async () => {
-    const uf = getValues().uf; //obtem o valor da UF selecionada no campo
+    const state = getValues().address.state; //obtem o valor da UF selecionada no campo
     try {
       // Faz uma requisição GET para a API do IBGE para buscar as cidades da UF selecionada
       const resp = await axios.get(
-        `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`
+        `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${state}/municipios`
       );
       const sortedCities = resp.data.sort((a: any, b: any) => // Ordena as cidades pelo nome
         a.nome.localeCompare(b.nome)
@@ -89,6 +92,27 @@ export default function CreateSupplier() {
     } catch (error) {
        // Captura e exibe um erro no console, caso ocorra
       console.error("Error ao buscar Cidade", error);
+    }
+  };
+
+  //Funcao para pegar Cep (get)
+  const handlePostalCodeSearch = async (e: any) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const postalCode = getValues().address.postalCode;
+      try {
+        const resp = await axios.get(
+          `https://brasilapi.com.br/api/cep/v1/${postalCode}`
+        );
+        const { state, city, neighborhood, street } = resp.data;
+        setValue("address.state", state);
+        setValue("address.district", neighborhood);
+        setValue("address.street", street);
+        handleCity();
+        setValue("address.city", city)
+      } catch (error) {
+        console.log("Error ao buscar cep",error);
+      }
     }
   };
 
@@ -116,21 +140,21 @@ export default function CreateSupplier() {
               spacing={5} // espacamento entre um input e outro
               templateColumns="5fr 5fr"
             >
-              <FormControl isInvalid={!!errors.razaoSocial}>
+              <FormControl isInvalid={!!errors.corporateName}>
                 <FormLabel>Razão social</FormLabel>
-                <Input id="razaoSocial" {...register("razaoSocial")} />
-                {errors.razaoSocial && (
+                <Input id="corporateName" {...register("corporateName")} />
+                {errors.corporateName && (
                   <FormErrorMessage>
-                    {errors.razaoSocial.message}
+                    {errors.corporateName.message}
                   </FormErrorMessage>
                 )}
               </FormControl>
-              <FormControl isInvalid={!!errors.nomeFantasia}>
+              <FormControl isInvalid={!!errors.tradeName}>
                 <FormLabel>Nome Fantasia</FormLabel>
-                <Input id="nomeFantasia" {...register("nomeFantasia")} />
-                {errors.nomeFantasia && (
+                <Input id="tradeName" {...register("tradeName")} />
+                {errors.tradeName && (
                   <FormErrorMessage>
-                    {errors.nomeFantasia.message}
+                    {errors.tradeName.message}
                   </FormErrorMessage>
                 )}
               </FormControl>
@@ -166,17 +190,17 @@ export default function CreateSupplier() {
                   <FormErrorMessage>{errors.cnpj.message}</FormErrorMessage>
                 )}
               </FormControl>
-              <FormControl isInvalid={!!errors.fone}>
+              <FormControl isInvalid={!!errors.phone}>
                 <FormLabel>Fone</FormLabel>
                 <Input
                   as={InputMask}
                   mask="(**) *****-****"
                   type="tel"
-                  id="fone"
-                  {...register("fone")}
+                  id="phone"
+                  {...register("phone")}
                 />
-                {errors.fone && (
-                  <FormErrorMessage>{errors.fone.message}</FormErrorMessage>
+                {errors.phone && (
+                  <FormErrorMessage>{errors.phone.message}</FormErrorMessage>
                 )}
               </FormControl>
             </SimpleGrid>
@@ -186,30 +210,31 @@ export default function CreateSupplier() {
               spacing={5}
               templateColumns="2fr 6fr 1fr"
             >
-              <FormControl isInvalid={!!errors.cep}>
+              <FormControl isInvalid={!!errors?.address?.postalCode}>
                 <FormLabel>Cep</FormLabel>
                 <Input
+                onKeyDown={handlePostalCodeSearch}
                   as={InputMask}
                   mask="**.***-***"
-                  id="cep"
-                  {...register("cep")}
+                  id="address.postalCode"
+                  {...register("address.postalCode")}
                 />
-                {errors.cep && (
-                  <FormErrorMessage>{errors.cep.message}</FormErrorMessage>
+                {errors?.address?.postalCode && (
+                  <FormErrorMessage>{errors?.address?.postalCode.message}</FormErrorMessage>
                 )}
               </FormControl>
-              <FormControl isInvalid={!!errors.endereco}>
+              <FormControl isInvalid={!!errors?.address?.street}>
                 <FormLabel>Endereço</FormLabel>
-                <Input id="endereco" {...register("endereco")} />
-                {errors.endereco && (
-                  <FormErrorMessage>{errors.endereco.message}</FormErrorMessage>
+                <Input id="address.street" {...register("address.street")} />
+                {errors?.address?.street && (
+                  <FormErrorMessage>{errors?.address?.street.message}</FormErrorMessage>
                 )}
               </FormControl>
-              <FormControl isInvalid={!!errors.numero}>
+              <FormControl isInvalid={!!errors?.address?.number}>
                 <FormLabel>Número</FormLabel>
-                <Input id="numero" {...register("numero")} />
-                {errors.numero && (
-                  <FormErrorMessage>{errors.numero.message}</FormErrorMessage>
+                <Input id="address.number" {...register("address.number")} />
+                {errors.address?.number && (
+                  <FormErrorMessage>{errors.address?.number.message}</FormErrorMessage>
                 )}
               </FormControl>
             </SimpleGrid>
@@ -219,16 +244,16 @@ export default function CreateSupplier() {
               spacing={5}
               templateColumns="4fr 1fr 4fr"
             >
-              <FormControl isInvalid={!!errors.bairro}>
+              <FormControl isInvalid={!!errors.address?.district}>
                 <FormLabel>Bairro</FormLabel>
-                <Input id="bairro" {...register("bairro")} />
-                {errors.bairro && (
-                  <FormErrorMessage>{errors.bairro.message}</FormErrorMessage>
+                <Input id="address.district" {...register("address.district")} />
+                {errors.address?.district && (
+                  <FormErrorMessage>{errors.address?.district.message}</FormErrorMessage>
                 )}
               </FormControl>
-              <FormControl isInvalid={!!errors.uf}>
+              <FormControl isInvalid={!!errors.address?.state}>
                 <FormLabel>UF</FormLabel>
-                <Select onClick={handleCity} id="uf" {...register("uf")}>
+                <Select onClick={handleCity} id="address.state" {...register("address.state")}>
                   <option></option>
                   {ufs.map((uf: any) => (
                     <option key={uf.id} value={uf.acronym}>
@@ -236,13 +261,13 @@ export default function CreateSupplier() {
                     </option>
                   ))}
                 </Select>
-                {errors.uf && (
-                  <FormErrorMessage>{errors.uf.message}</FormErrorMessage>
+                {errors.address?.state && (
+                  <FormErrorMessage>{errors.address?.state.message}</FormErrorMessage>
                 )}
               </FormControl>
-              <FormControl isInvalid={!!errors.cidade}>
+              <FormControl isInvalid={!!errors.address?.city}>
                 <FormLabel>Cidade</FormLabel>
-                <Select id="cidade" {...register("cidade")}>
+                <Select id="address.city" {...register("address.city")}>
                   <option></option>
                   {cities.map((citie: any) => (
                     <option key={citie.id} value={citie.nome}>
@@ -250,8 +275,8 @@ export default function CreateSupplier() {
                     </option>
                   ))}
                 </Select>
-                {errors.cidade && (
-                  <FormErrorMessage>{errors.cidade.message}</FormErrorMessage>
+                {errors.address?.city && (
+                  <FormErrorMessage>{errors.address?.city.message}</FormErrorMessage>
                 )}
               </FormControl>
             </SimpleGrid>
