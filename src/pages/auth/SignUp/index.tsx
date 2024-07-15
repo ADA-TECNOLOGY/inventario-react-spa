@@ -17,7 +17,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { Controller, set, SubmitHandler, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useCallback, useEffect, useState } from "react";
 import { SignUpFormData, signUpFormSchema } from "./formSchema";
@@ -27,14 +27,20 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 export default function SignUp() {
-  const { register, control, handleSubmit, getValues, formState, setValue } =
-    useForm<SignUpFormData>({
-      resolver: yupResolver(signUpFormSchema) as any,
-    });
+  const {
+    register,
+    control,
+    handleSubmit,
+    getValues,
+    formState,
+    setValue
+  } = useForm<SignUpFormData>({
+    resolver: yupResolver(signUpFormSchema) as any,
+  });
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [uf, setUf] = useState<string[]>([]);
-  const [cities, setCities] = useState<string[]>([]);
+  const [cities, setCities] = useState<[]>([]);
   const [typeDocument, setTypeDocument] = useState("cnpj");
   const { errors } = formState;
 
@@ -82,56 +88,62 @@ export default function SignUp() {
     []
   );
 
-  //Funcao para pegar Cep (get)
-  const handlePostalCodeSearch = async (e:any) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const postalCode = getValues().postalCode;
-      try {
-        const resp = await axios.get(
-          `https://brasilapi.com.br/api/cep/v1/${postalCode}`
-        );
-        const { state, city, neighborhood, street } = resp.data;
-        setValue("state", state)
-        setValue("city", city)
-        await handleCity()
-        setValue("district", neighborhood)
-        setValue("street", street)
-      } catch (error) {
-        console.log(error);
-      }
+  //Funcao para trazer ufs
+  const dataUf = async () => {
+    try {
+      const resp = await axios.get("http://localhost:8080/state");
+      const sortedUf = resp.data.sort(); //const criada para ordenar lista passando para o retorno da req.
+      setUf(sortedUf); // os estado retornando ja com a const de ordenacao
+    } catch (error) {
+      console.error("Error ao buscar UF", error);
     }
   };
 
-  //Funcao para trazer ufs
   useEffect(() => {
-    const dataUf = async () => {
-      try {
-        const resp = await axios.get("http://localhost:8080/state");
-        const sortedUf = resp.data.sort(); //const criada para ordenar lista passando para o retorno da req.
-        setUf(sortedUf); // os estado retornando ja com a const de ordenacao
-      } catch (error) {
-        console.error("Error ao buscar UF", error);
-      }
-    };
     dataUf();
-  }, []);
+    //TODO: Melhorar isso
+    setValue("city", getValues().city)
+
+  }, [cities]);
 
   //Funcao para trazer as cidades ao clicar na UF
   const handleCity = async () => {
-    const ufs = getValues().state
+    const state = getValues().state
     try {
       const resp = await axios.get(
-        `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${ufs}/municipios`
+        `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${state}/municipios`
       );
       const sortedCities = resp.data.sort((a: any, b: any) =>
         a.nome.localeCompare(b.nome)
       );
       setCities(sortedCities);
+      console.log(cities)
     } catch (error) {
       console.error("Error ao buscar Cidades");
     }
   };
+
+    //Funcao para pegar Cep (get)
+    const handlePostalCodeSearch = async (e: any) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const postalCode = getValues().postalCode;
+        try {
+          const resp = await axios.get(
+            `https://brasilapi.com.br/api/cep/v1/${postalCode}`
+          );
+          const { state, city, neighborhood, street } = resp.data;
+          setValue("state", state);
+          setValue("district", neighborhood);
+          setValue("street", street);
+          handleCity();
+          setValue("city", city)
+          console.log(getValues().city)
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
 
   //Funcao para atualizar o estado typedocument com novo valor
   const handleTypeDocumentChange = (value: any) => {
@@ -301,7 +313,7 @@ export default function SignUp() {
                     <Select
                       onChange={(e) => {
                         field.onChange(e);
-                        handleCity(e);
+                        handleCity();
                       }}
                       id="state"
                       value={field.value}
