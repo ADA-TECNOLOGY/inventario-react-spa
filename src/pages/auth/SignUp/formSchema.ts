@@ -12,10 +12,11 @@ export const signUpFormSchema = yup.object().shape({
   tradeName: yup.string().required("Campo obrigatório"), //nomeFantasia
   email: yup.string().required("Campo obrigatório").email("E-mail inválido"),
   phone: yup.string().required("Campo obrigatório"),
-  address: yup.string().required("Campo obrigatório"),
+  district: yup.string().required("Campo obrigatório"),
+  street: yup.string().required("Campo obrigatório"),
   number: yup.string().required("Campo obrigatório"),
   postalCode: yup.string().required("Campo obrigatório"),
-  state: yup.string().required("Campo obrigatório"),
+  state: yup.string().required("Campo obrigatório"), //
   city: yup.string().required("Campo obrigatório"),
   password: yup
     .string()
@@ -28,14 +29,15 @@ export const signUpFormSchema = yup.object().shape({
 });
 
 export type SignUpFormData = {
-  cnpj: number;
+  cnpj: string;
   corporateName: string;
   tradeName: string;
   email: string;
   phone: string;
-  address: string;
+  district: string;
+  street: string;
   number: number;
-  postalCode: number;
+  postalCode: string;
   state: string;
   city: string;
   complement: string;
