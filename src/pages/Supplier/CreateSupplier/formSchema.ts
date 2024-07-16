@@ -1,13 +1,13 @@
 import * as yup from "yup";
 
 export const createSupplierFormSchema = yup.object().shape({
-  cnpj: yup
+  document: yup
     .string()
-    .required("Campo obrigatório")
-    .matches(
-      /^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}\-?\d{2}$/,
-      "Formato de CNPJ inválido"
-    ),
+    .required("Campo obrigatório"),
+    // .matches(
+    //   /^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}\-?\d{2}$/,
+    //   "Formato de document inválido"
+    // ),
   corporateName: yup.string().required("Campo obrigatório"),
   tradeName: yup.string().required("Campo obrigatório"),
   email: yup.string().required("Campo obrigatório").email("E-mail inválido"),
@@ -23,20 +23,24 @@ export const createSupplierFormSchema = yup.object().shape({
   
 });
 
-export interface Address {
+export type  Address = {
   postalCode: string;
   street: string;
   number: string;
   district: string;
   city: string;
   state: string;
+  complement: string;
+  
 }
 
-export interface CreateSupplierFormData {
-  cnpj: string;
+export type  CreateSupplierFormData = {
+  id: number;
+  document: string;
   corporateName: string;
   tradeName: string;
   email: string;
   phone: string;
   address: Address;
+  active: boolean;
 }

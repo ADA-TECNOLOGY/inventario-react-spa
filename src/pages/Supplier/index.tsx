@@ -1,14 +1,12 @@
 import {
   Box,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
   Button,
   Container,
   Flex,
   Heading,
   IconButton,
   Spacer,
+  Switch,
   Table,
   TableContainer,
   Tbody,
@@ -16,44 +14,54 @@ import {
   Th,
   Thead,
   Tr,
+  useToast,
 } from "@chakra-ui/react";
-import { useState } from "react";
-import { MdCreate, MdDehaze, MdLock } from "react-icons/md";
+import { useEffect, useState } from "react";
+import { MdCreate, MdDehaze } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { CreateSupplierFormData } from "./CreateSupplier/formSchema";
+import api from "../../services/api";
 
 export default function Supplier() {
   const navigate = useNavigate();
+  const toast = useToast()
 
-  const [suppliers, setSuppliers] = useState([
-    {
-      id: 1,
-      name: "João Silva",
-      document: "123456789",
-      phone: "(11) 1234-5678",
-      status: "Ativo",
-    },
-    {
-      id: 2,
-      name: "Maria Oliveira",
-      document: "987654321",
-      phone: "(21) 8765-4321",
-      status: "Inativo",
-    },
-    {
-      id: 3,
-      name: "Carlos Souza",
-      document: "456789123",
-      phone: "(31) 4567-8912",
-      status: "Ativo",
-    },
-    {
-      id: 4,
-      name: "Ana Costa",
-      document: "789123456",
-      phone: "(41) 7891-2345",
-      status: "Pendente",
-    },
-  ]);
+  const [suppliers, setSuppliers] = useState<CreateSupplierFormData[]>([]);
+
+  const handleDataSupplier = async () => {
+    try {
+      const resp = await api.get("/supplier/page?page=0&size=10");
+      setSuppliers(resp.data.content) 
+    }catch(error){
+      console.error("Error ao buscar dados fornecedores", error)
+    }
+  }
+
+  const enableDisableSupplier = async (idSupplier:number) => {
+    try {
+      const resp = await api.patch(`/supplier/disableOrActivate/${idSupplier}`);
+        if(resp.status == 200) {
+          toast({
+            
+            description: `${resp.data.active 
+              ? "Fornecedor ativado com sucesso!" 
+              : "Fornecedor desativado com sucesso!"}`,
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+          })
+          handleDataSupplier()
+        }
+    }catch(error) {
+      console.error("Erro ao atualizar.", error)
+    }
+  }
+
+  useEffect(() => {
+    handleDataSupplier()
+  }, [])
+  
+
 
   return (
     <Container maxW="container.lg">
@@ -78,17 +86,23 @@ export default function Supplier() {
                 <Th>Nome</Th>
                 <Th>CNPJ/CPF</Th>
                 <Th>Fone</Th>
-                <Th>Status</Th>
+                <Th>Ativar / Inativar</Th>
                 <Th>Ações</Th>
               </Tr>
             </Thead>
             <Tbody>
-              {suppliers.map((e: any) => (
+              {suppliers?.map((e: CreateSupplierFormData) => (
                 <Tr key={e?.id}>
-                  <Td>{e.name}</Td>
+                  <Td>{e.corporateName}</Td>
                   <Td>{e.document}</Td>
                   <Td>{e.phone}</Td>
-                  <Td>{e.status}</Td>
+                  <Td alignContent={"center"}>
+                  <Switch 
+                      onChange={()=>enableDisableSupplier(e.id)}
+                      isChecked={e.active}
+                      title={e.active ? "Inativar" : "Ativar"}
+                      colorScheme="teal" />
+                  </Td>
                   <Td>
                     <IconButton
                       bg={"white"}
@@ -101,12 +115,6 @@ export default function Supplier() {
                       aria-label={"Editar"}
                       color={"teal"}
                       icon={<MdCreate />}
-                    ></IconButton>
-                    <IconButton
-                      bg={"white"}
-                      aria-label={"Excluir"}
-                      color={"teal"}
-                      icon={<MdLock />}
                     ></IconButton>
                   </Td>
                 </Tr>

@@ -12,12 +12,11 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
-  Radio, 
+  Radio,
   RadioGroup,
   Select,
   SimpleGrid,
   Stack,
-  Textarea,
 } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup"; // esquema de validacao
 import { Controller, SubmitHandler, useForm } from "react-hook-form"; // Hooks e funções do react-hook-form para gerenciamento de formulários.
@@ -26,7 +25,8 @@ import { useCallback, useEffect, useState } from "react";
 import InputMask from "react-input-mask";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../../../services/api";
 
 export default function CreateSupplier() {
   const { register, control, handleSubmit, formState, getValues, setValue } =
@@ -39,25 +39,42 @@ export default function CreateSupplier() {
   const [cities, setCities] = useState<any>([]);
   const [typeDocument, setTypeDocument] = useState("cnpj");
   const { errors } = formState;
+  const navigate = useNavigate();
 
   //Salva o dados do fornecedor
-  const handleCreateSupplier: SubmitHandler<CreateSupplierFormData> = useCallback(
-    async (values) => {
-      setIsLoading(true); //inicia o estado(como true)
-      setTimeout(() => {
-        setIsLoading(false);
-        console.log(values);
-      }, 2000);
-      Swal.fire({
-        position: "top-end",
-        icon: "success",
-        title: "Fornecedor salvo com sucesso!",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-    },
-    []
-  );
+  const handleCreateSupplier: SubmitHandler<CreateSupplierFormData> =
+    useCallback(async (values) => {
+      setIsLoading(true);
+      try {
+        const formData = {
+          ...values,
+          postalCode: values.address.postalCode.replace(/\D/g, ""),
+          phone: values.phone.replace(/\D/g, ""),
+          document: values.document.replace(/[.\-/() ]/g, ""),
+        };
+        await api.post("/supplier", formData);
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "Fornecedor salvo com sucesso!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        setTimeout(() => {
+          navigate("/supplier");
+        }, 3000);
+      } catch (error) {
+        console.error("Error while saving supplier:", error);
+        Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: "Erro ao salvar fornecedor!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+      setIsLoading(false);
+    }, []);
 
   //usada para buscar ums lista de estado por UF de uma API
   const dataState = async () => {
@@ -65,16 +82,15 @@ export default function CreateSupplier() {
       const resp = await axios.get("http://localhost:8080/state"); //faz a requisicao
       const sortUfs = resp.data.sort(); //ordena os estados recebidos
       setUfs(sortUfs); // Armazena os estados ordenados no estado 'ufs'
-      setUfs(resp.data); 
+      setUfs(resp.data);
     } catch (error) {
       console.error("Error ao buscar UF", error); // Captura e exibe um erro no console, caso ocorra
     }
   };
-  
 
   useEffect(() => {
     dataState(); // Chama a função para buscar os estados
-     setValue("address.city", getValues().address.city)
+    setValue("address.city", getValues().address.city);
   }, [cities]);
 
   //busca uma lista de cidades usando a API do IBGE(conforme a uf selecionada)
@@ -85,12 +101,15 @@ export default function CreateSupplier() {
       const resp = await axios.get(
         `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${state}/municipios`
       );
-      const sortedCities = resp.data.sort((a: any, b: any) => // Ordena as cidades pelo nome
-        a.nome.localeCompare(b.nome)
+      const sortedCities = resp.data.sort(
+        (
+          a: any,
+          b: any // Ordena as cidades pelo nome
+        ) => a.nome.localeCompare(b.nome)
       );
-      setCities(sortedCities);   // Atualiza o estado 'cities' com a lista de cidades ordenadas
+      setCities(sortedCities); // Atualiza o estado 'cities' com a lista de cidades ordenadas
     } catch (error) {
-       // Captura e exibe um erro no console, caso ocorra
+      // Captura e exibe um erro no console, caso ocorra
       console.error("Error ao buscar Cidade", error);
     }
   };
@@ -109,23 +128,25 @@ export default function CreateSupplier() {
         setValue("address.district", neighborhood);
         setValue("address.street", street);
         handleCity();
-        setValue("address.city", city)
+        setValue("address.city", city);
       } catch (error) {
-        console.log("Error ao buscar cep",error);
+        console.log("Error ao buscar cep", error);
       }
     }
   };
 
   //usada para atualizar o estado typeDocument com um novo valor
-  const handleTypeDocumentChange = (value:any) => {
-    setTypeDocument(value)
+  const handleTypeDocumentChange = (value: any) => {
+    setTypeDocument(value);
   };
 
   return (
     <Container maxW="container.lg" mb="2%">
       <Breadcrumb fontWeight="medium" fontSize="lg">
         <BreadcrumbItem>
-          <BreadcrumbLink as={Link} to="/supplier">Fornecedores</BreadcrumbLink>
+          <BreadcrumbLink as={Link} to="/supplier">
+            Fornecedores
+          </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbItem isCurrentPage>
           <BreadcrumbLink color={"teal"}>Cadastro</BreadcrumbLink>
@@ -162,34 +183,51 @@ export default function CreateSupplier() {
             <SimpleGrid
               alignItems={"center"}
               mt={3}
-              columns={3}
+              columns={2}
               spacing={5}
-              templateColumns="1fr 5fr 3fr"
+              templateColumns="1fr 5fr"
             >
-              <RadioGroup mt={6} value={typeDocument} onChange={handleTypeDocumentChange}>
+              <RadioGroup
+                mt={6}
+                value={typeDocument}
+                onChange={handleTypeDocumentChange}
+              >
                 <Stack direction="row">
                   <Radio value="cnpj">CNPJ</Radio>
                   <Radio value="cpf">CPF</Radio>
                 </Stack>
               </RadioGroup>
-              <FormControl isInvalid={!!errors.cnpj}>
-                <FormLabel>{typeDocument === "cnpj" ? "CNPJ" : "CPF"}</FormLabel>
+              <FormControl isInvalid={!!errors.document}>
+                <FormLabel>
+                  {typeDocument === "cnpj" ? "CNPJ" : "CPF"}
+                </FormLabel>
                 <Controller
-                  name="cnpj"
+                  name="document"
                   control={control}
                   render={({ field }) => (
                     <Input
                       as={InputMask}
-                      mask={typeDocument === "cnpj" ? "99.999.999/9999-99" : "999.999.999-99"}
-                      id="cnpj"
+                      mask={
+                        typeDocument === "cnpj"
+                          ? "99.999.999/9999-99"
+                          : "999.999.999-99"
+                      }
+                      id="document"
                       {...field}
                     />
                   )}
                 />
-                {errors.cnpj && (
-                  <FormErrorMessage>{errors.cnpj.message}</FormErrorMessage>
+                {errors.document && (
+                  <FormErrorMessage>{errors.document.message}</FormErrorMessage>
                 )}
               </FormControl>
+            </SimpleGrid>
+            <SimpleGrid
+              mt={3}
+              columns={2}
+              spacing={2}
+              templateColumns="1fr 3fr"
+            >
               <FormControl isInvalid={!!errors.phone}>
                 <FormLabel>Fone</FormLabel>
                 <Input
@@ -203,6 +241,13 @@ export default function CreateSupplier() {
                   <FormErrorMessage>{errors.phone.message}</FormErrorMessage>
                 )}
               </FormControl>
+              <FormControl isInvalid={!!errors.email}>
+                <FormLabel>E-mail</FormLabel>
+                <Input id="email" {...register("email")} />
+                {errors.email && (
+                  <FormErrorMessage>{errors.email.message}</FormErrorMessage>
+                )}
+              </FormControl>
             </SimpleGrid>
             <SimpleGrid
               mt={3}
@@ -213,28 +258,34 @@ export default function CreateSupplier() {
               <FormControl isInvalid={!!errors?.address?.postalCode}>
                 <FormLabel>Cep</FormLabel>
                 <Input
-                onKeyDown={handlePostalCodeSearch}
+                  onKeyDown={handlePostalCodeSearch}
                   as={InputMask}
                   mask="**.***-***"
                   id="address.postalCode"
                   {...register("address.postalCode")}
                 />
                 {errors?.address?.postalCode && (
-                  <FormErrorMessage>{errors?.address?.postalCode.message}</FormErrorMessage>
+                  <FormErrorMessage>
+                    {errors?.address?.postalCode.message}
+                  </FormErrorMessage>
                 )}
               </FormControl>
               <FormControl isInvalid={!!errors?.address?.street}>
                 <FormLabel>Endereço</FormLabel>
                 <Input id="address.street" {...register("address.street")} />
                 {errors?.address?.street && (
-                  <FormErrorMessage>{errors?.address?.street.message}</FormErrorMessage>
+                  <FormErrorMessage>
+                    {errors?.address?.street.message}
+                  </FormErrorMessage>
                 )}
               </FormControl>
               <FormControl isInvalid={!!errors?.address?.number}>
                 <FormLabel>Número</FormLabel>
                 <Input id="address.number" {...register("address.number")} />
                 {errors.address?.number && (
-                  <FormErrorMessage>{errors.address?.number.message}</FormErrorMessage>
+                  <FormErrorMessage>
+                    {errors.address?.number.message}
+                  </FormErrorMessage>
                 )}
               </FormControl>
             </SimpleGrid>
@@ -246,14 +297,23 @@ export default function CreateSupplier() {
             >
               <FormControl isInvalid={!!errors.address?.district}>
                 <FormLabel>Bairro</FormLabel>
-                <Input id="address.district" {...register("address.district")} />
+                <Input
+                  id="address.district"
+                  {...register("address.district")}
+                />
                 {errors.address?.district && (
-                  <FormErrorMessage>{errors.address?.district.message}</FormErrorMessage>
+                  <FormErrorMessage>
+                    {errors.address?.district.message}
+                  </FormErrorMessage>
                 )}
               </FormControl>
               <FormControl isInvalid={!!errors.address?.state}>
                 <FormLabel>UF</FormLabel>
-                <Select onClick={handleCity} id="address.state" {...register("address.state")}>
+                <Select
+                  onClick={handleCity}
+                  id="address.state"
+                  {...register("address.state")}
+                >
                   <option></option>
                   {ufs.map((uf: any) => (
                     <option key={uf.id} value={uf.acronym}>
@@ -262,7 +322,9 @@ export default function CreateSupplier() {
                   ))}
                 </Select>
                 {errors.address?.state && (
-                  <FormErrorMessage>{errors.address?.state.message}</FormErrorMessage>
+                  <FormErrorMessage>
+                    {errors.address?.state.message}
+                  </FormErrorMessage>
                 )}
               </FormControl>
               <FormControl isInvalid={!!errors.address?.city}>
@@ -276,20 +338,16 @@ export default function CreateSupplier() {
                   ))}
                 </Select>
                 {errors.address?.city && (
-                  <FormErrorMessage>{errors.address?.city.message}</FormErrorMessage>
+                  <FormErrorMessage>
+                    {errors.address?.city.message}
+                  </FormErrorMessage>
                 )}
               </FormControl>
             </SimpleGrid>
             <SimpleGrid mt={3}>
               <FormControl>
                 <FormLabel>Complemento</FormLabel>
-                <Input />
-              </FormControl>
-            </SimpleGrid>
-            <SimpleGrid mt={3}>
-              <FormControl>
-                <FormLabel>Observação</FormLabel>
-                <Textarea />
+                <Input {...register("address.complement")} />
               </FormControl>
             </SimpleGrid>
             <Flex justify="flex-end" padding="10px">
