@@ -21,17 +21,23 @@ import { MdCreate, MdDehaze } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { CreateSupplierFormData } from "./CreateSupplier/formSchema";
 import api from "../../services/api";
+import { Page } from "../../model/interface/pagination.interface";
+import Pagination from "../../components/PaginationGroupItems";
 
 export default function Supplier() {
   const navigate = useNavigate();
   const toast = useToast()
 
   const [suppliers, setSuppliers] = useState<CreateSupplierFormData[]>([]);
+  const [pagination, setPagination] = useState<Page>({} as Page);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
-  const handleDataSupplier = async () => {
+  const handleDataSupplier = async (page: number, size?: number) => {
     try {
-      const resp = await api.get("/supplier/page?page=0&size=10");
+      const resp = await api.get(`/supplier/page?page=${page}&size=${size}`);
+      setItemsPerPage(size || 10); // quantiade de item por página
       setSuppliers(resp.data.content) 
+      setPagination(resp.data) // Receber objeto referente a páginação
     }catch(error){
       console.error("Error ao buscar dados fornecedores", error)
     }
@@ -50,7 +56,7 @@ export default function Supplier() {
             duration: 3000,
             isClosable: true,
           })
-          handleDataSupplier()
+          handleDataSupplier(pagination?.number, pagination?.totalPages)
         }
     }catch(error) {
       console.error("Erro ao atualizar.", error)
@@ -58,7 +64,7 @@ export default function Supplier() {
   }
 
   useEffect(() => {
-    handleDataSupplier()
+    handleDataSupplier(0, 10)
   }, [])
   
 
@@ -121,6 +127,14 @@ export default function Supplier() {
               ))}
             </Tbody>
           </Table>
+          {/* Componente de páginação */}
+          <Pagination
+          currentPage={pagination?.number || 0}
+          totalPages={pagination?.totalPages || 0}
+          onPageChange={handleDataSupplier}
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={handleDataSupplier}
+        />
         </TableContainer>
       </Box>
     </Container>
