@@ -17,7 +17,7 @@ const Pagination = ({
   onItemsPerPageChange,
 }: PaginationProps) => {
   const handlePrevPage = () => {
-    if (currentPage > 1) {
+    if (currentPage > 0) {
       onPageChange(currentPage - 1, itemsPerPage);
     }
   };
@@ -51,14 +51,14 @@ const Pagination = ({
         aria-label=""
         icon={<ChevronLeftIcon />}
         onClick={handlePrevPage}
-        isDisabled={currentPage === 1}
+        isDisabled={currentPage === 0}
       />
       {renderPageNumbers()}
       <IconButton
         aria-label=""
         icon={<ChevronRightIcon />}
         onClick={handleNextPage}
-        isDisabled={currentPage === totalPages}
+        isDisabled={currentPage === totalPages- 1}
       />
       <Spacer/>
       <Text>Itens por página</Text>
