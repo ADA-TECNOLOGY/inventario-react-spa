@@ -1,13 +1,12 @@
 import { Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Button, Card, CardBody, Container, Flex, FormControl, FormErrorMessage, FormLabel, Input, Radio, RadioGroup, Select, SimpleGrid, Stack } from "@chakra-ui/react";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm, useWatch } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { EditSupplierFormData, editSupplierFormSchema, Address } from './formSchema';
+import { EditSupplierFormData, editSupplierFormSchema } from './formSchema';
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useCallback, useEffect, useState } from "react";
 import api from "../../../services/api";
 import Swal from "sweetalert2";
 import axios from "axios";
-import InputMask from 'react-input-mask';
 
 export default function EditSupplier() {
 
@@ -23,25 +22,25 @@ export default function EditSupplier() {
   const { errors } = formState;
   const navigate = useNavigate();
   const { id } = useParams(); // obtem o id que esta na rota
-
+  const controlState = useWatch({ control, name: 'address.state'})
   // Função para trazer os dados da tela
   const getBySupplier = async () => {
      try {
          const resp = await api.get(`/supplier/${id}`)
-            setValue("corporateName", resp.data.corporateName)
-            setValue("tradeName", resp.data.tradeName)
-            setValue("document", resp.data.document)
-            setValue("phone", resp.data.phone)
-            setValue("email", resp.data.email)
-            setValue("address", resp.data.address)
-            console.log(getValues())
+          const supplier = resp.data
+            setValue("corporateName", supplier.corporateName)
+            setValue("tradeName", supplier.tradeName)
+            setValue("document", supplier.document)
+            setValue("phone", supplier.phone)
+            setValue("email", supplier.email)
+            setValue("address", supplier.address)
    } catch (error) {
         console.error("Erro ao buscar dados", error)
    }
   }
 
   //Salva o dados do fornecedor
-  const handleCreateSupplier: SubmitHandler<EditSupplierFormData> =
+  const handleUpdateSupplier: SubmitHandler<EditSupplierFormData> =
     useCallback(async (values) => {
       setIsLoading(true);
       try {
@@ -51,11 +50,11 @@ export default function EditSupplier() {
           phone: values.phone.replace(/\D/g, ""),
           document: values.document.replace(/[.\-/() ]/g, ""),
         };
-        await api.post("/supplier", formData);
+        await api.put(`/supplier/${id}`, formData);
         Swal.fire({
           position: "top-end",
           icon: "success",
-          title: "Fornecedor salvo com sucesso!",
+          title: "Fornecedor atualizado com sucesso!",
           showConfirmButton: false,
           timer: 1500,
         });
@@ -63,7 +62,7 @@ export default function EditSupplier() {
           navigate("/supplier");
         }, 3000);
       } catch (error) {
-        console.error("Error while saving supplier:", error);
+        console.error("Erro ao atualizar Fornecedor:", error);
         
       }
       setIsLoading(false);
@@ -84,9 +83,11 @@ export default function EditSupplier() {
   useEffect(() => {
     dataState(); // Chama a função para buscar os estados
     getBySupplier() // chama a funcao de trazer os dados da tela
-    setValue("address.state", getValues().address.state);
     setValue("address.city", getValues().address.city);
-  }, [cities]);
+    if(controlState){
+      handleCity()
+    }
+  }, [controlState]);
 
   //busca uma lista de cidades usando a API do IBGE(conforme a uf selecionada)
   const handleCity = async () => {
@@ -149,7 +150,7 @@ export default function EditSupplier() {
         </Breadcrumb>
         <Card mt={5}>
           <CardBody textAlign={"center"}>
-            <Box as="form" onSubmit={handleSubmit(handleCreateSupplier)} mt="5">
+            <Box as="form" onSubmit={handleSubmit(handleUpdateSupplier)} mt="5">
               <SimpleGrid
                 mt={3} // espaçamento entre input de cima e o debaixo
                 columns={2} // quantidade de colunas
@@ -201,12 +202,6 @@ export default function EditSupplier() {
                     control={control}
                     render={({ field }) => (
                       <Input
-                        as={InputMask}
-                        mask={
-                          typeDocument === "cnpj"
-                            ? "99.999.999/9999-99"
-                            : "999.999.999-99"
-                        }
                         id="document"
                         {...field}
                       />
@@ -226,8 +221,6 @@ export default function EditSupplier() {
                 <FormControl isInvalid={!!errors.phone}>
                   <FormLabel>Fone</FormLabel>
                   <Input
-                    as={InputMask}
-                    mask="(**) *****-****"
                     type="tel"
                     id="phone"
                     {...register("phone")}
@@ -254,8 +247,6 @@ export default function EditSupplier() {
                   <FormLabel>Cep</FormLabel>
                   <Input
                     onKeyDown={handlePostalCodeSearch}
-                    as={InputMask}
-                    mask="**.***-***"
                     id="address.postalCode"
                     {...register("address.postalCode")}
                   />
@@ -349,7 +340,6 @@ export default function EditSupplier() {
                 <Button
                   type="submit"
                   colorScheme={"teal"}
-                  width={"15%"}
                   mt={5}
                   isLoading={isLoading}
                 >

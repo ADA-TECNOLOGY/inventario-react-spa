@@ -55,7 +55,7 @@ export default function Supplier() {
             duration: 3000,
             isClosable: true,
           })
-          handleDataSupplier(pagination?.number, pagination?.totalPages)
+          handleDataSupplier(pagination?.number, itemsPerPage)
         }
     }catch(error) {
       console.error("Erro ao atualizar.", error)
