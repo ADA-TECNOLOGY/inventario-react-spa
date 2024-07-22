@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Container,
   Flex,
   Heading,
   IconButton,
@@ -70,7 +69,7 @@ export default function Supplier() {
 
 
   return (
-    <Container maxW="container.lg">
+    <Box>
       <Flex alignItems={"center"}>
         <Heading as="h4" size={"md"}>
           Fornecedores
@@ -112,12 +111,15 @@ export default function Supplier() {
                   <Td>
                     <IconButton
                       bg={"white"}
+                      title="Detalhe"
                       aria-label={"Detalhe"}
                       color={"teal"}
                       icon={<MdDehaze />}
                     ></IconButton>
                     <IconButton
+                      onClick={()=> navigate(`/supplier/${e.id}`)}
                       bg={"white"}
+                      title="Editar"
                       aria-label={"Editar"}
                       color={"teal"}
                       icon={<MdCreate />}
@@ -137,6 +139,6 @@ export default function Supplier() {
         />
         </TableContainer>
       </Box>
-    </Container>
+    </Box>
   );
 }

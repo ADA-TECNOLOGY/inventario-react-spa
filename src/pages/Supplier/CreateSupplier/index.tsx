@@ -65,13 +65,7 @@ export default function CreateSupplier() {
         }, 3000);
       } catch (error) {
         console.error("Error while saving supplier:", error);
-        Swal.fire({
-          position: "top-end",
-          icon: "error",
-          title: "Erro ao salvar fornecedor!",
-          showConfirmButton: false,
-          timer: 1500,
-        });
+        
       }
       setIsLoading(false);
     }, []);

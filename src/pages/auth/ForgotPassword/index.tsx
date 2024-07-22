@@ -11,7 +11,7 @@ export enum Page {
 }
 
 export default function ForgotPassword() {
-  const [nextPage, setNextPage] = useState(Page.RedefinePassword);
+  const [nextPage, setNextPage] = useState(Page.SendEmail);
 
   const handleNextPage = (value: Page) => {
     setNextPage(value);

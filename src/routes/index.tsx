@@ -6,6 +6,7 @@ import SignUp from "../pages/auth/SignUp";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import Supplier from "../pages/Supplier";
 import CreateSupplier from "../pages/Supplier/CreateSupplier";
+import EditSupplier from "../pages/Supplier/EditSupplier";
 
 interface Props {
   children?: ReactNode;
@@ -47,6 +48,14 @@ const RouteApp = () => {
         element={
           <ProtectedRoute>
             <CreateSupplier />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/supplier/:id"
+        element={
+          <ProtectedRoute>
+            <EditSupplier />
           </ProtectedRoute>
         }
       />
