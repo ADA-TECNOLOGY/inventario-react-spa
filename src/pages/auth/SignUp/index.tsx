@@ -21,7 +21,6 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useCallback, useEffect, useState } from "react";
 import { SignUpFormData, signUpFormSchema } from "./formSchema";
-import InputMask from "react-input-mask";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -212,12 +211,6 @@ export default function SignUp() {
                   render={({ field }) => (
                     <Input
                       {...register("cnpj")}
-                      as={InputMask}
-                      mask={
-                        typeDocument === "cnpj"
-                          ? "99.999.999/9999-99"
-                          : "999.999.999-99"
-                      }
                       id="cnpj"
                       {...field}
                     />
@@ -244,8 +237,6 @@ export default function SignUp() {
               <FormControl isInvalid={!!errors.phone}>
                 <FormLabel>Fone</FormLabel>
                 <Input
-                  as={InputMask}
-                  mask="(**) *****-****"
                   type="tel"
                   id="phone"
                   {...register("phone")}
@@ -265,8 +256,6 @@ export default function SignUp() {
                 <FormLabel>Cep</FormLabel>
                 <Input
                   onKeyDown={handlePostalCodeSearch}
-                  as={InputMask}
-                  mask="**.***-***"
                   id="postalCode"
                   {...register("postalCode")}
                 />

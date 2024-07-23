@@ -16,7 +16,7 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider = ({ children }: any) => {
   const [data, setData] = useState<any | any>(localStorage.getItem("token") || "");
-  const [openSidebar, setOpenSidebar] = useState<boolean>(true);
+  const [openSidebar, setOpenSidebar] = useState<boolean>(false);
 
   const setToken = (token: string) => {
     localStorage.setItem("token", token);

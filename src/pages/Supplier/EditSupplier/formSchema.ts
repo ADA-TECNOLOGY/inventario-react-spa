@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-export const createSupplierFormSchema = yup.object().shape({
+export const editSupplierFormSchema = yup.object().shape({
   document: yup
     .string()
     .required("Campo obrigatório"),
@@ -34,7 +34,7 @@ export type  Address = {
   
 }
 
-export type  CreateSupplierFormData = {
+export type  EditSupplierFormData = {
   id: number;
   document: string;
   corporateName: string;
