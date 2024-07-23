@@ -22,6 +22,8 @@ import { CreateSupplierFormData } from "./CreateSupplier/formSchema";
 import api from "../../services/api";
 import { Page } from "../../model/interface/pagination.interface";
 import Pagination from "../../components/PaginationGroupItems";
+import { formatDocument } from "../../util/masckDocument";
+import { formatPhone } from "../../util/maskPhone";
 
 export default function Supplier() {
   const navigate = useNavigate();
@@ -99,8 +101,8 @@ export default function Supplier() {
               {suppliers?.map((e: CreateSupplierFormData) => (
                 <Tr key={e?.id}>
                   <Td>{e.corporateName}</Td>
-                  <Td>{e.document}</Td>
-                  <Td>{e.phone}</Td>
+                  <Td>{formatDocument(e.document)}</Td>
+                  <Td>{formatPhone(e.phone)}</Td>
                   <Td alignContent={"center"}>
                   <Switch 
                       onChange={()=>enableDisableSupplier(e.id)}

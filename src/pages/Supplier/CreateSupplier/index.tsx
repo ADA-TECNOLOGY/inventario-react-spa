@@ -22,7 +22,6 @@ import { yupResolver } from "@hookform/resolvers/yup"; // esquema de validacao
 import { Controller, SubmitHandler, useForm } from "react-hook-form"; // Hooks e funções do react-hook-form para gerenciamento de formulários.
 import { CreateSupplierFormData, createSupplierFormSchema } from "./formSchema";
 import { useCallback, useEffect, useState } from "react";
-import InputMask from "react-input-mask";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
@@ -200,12 +199,6 @@ export default function CreateSupplier() {
                   control={control}
                   render={({ field }) => (
                     <Input
-                      as={InputMask}
-                      mask={
-                        typeDocument === "cnpj"
-                          ? "99.999.999/9999-99"
-                          : "999.999.999-99"
-                      }
                       id="document"
                       {...field}
                     />
@@ -225,8 +218,6 @@ export default function CreateSupplier() {
               <FormControl isInvalid={!!errors.phone}>
                 <FormLabel>Fone</FormLabel>
                 <Input
-                  as={InputMask}
-                  mask="(**) *****-****"
                   type="tel"
                   id="phone"
                   {...register("phone")}
@@ -253,8 +244,6 @@ export default function CreateSupplier() {
                 <FormLabel>Cep</FormLabel>
                 <Input
                   onKeyDown={handlePostalCodeSearch}
-                  as={InputMask}
-                  mask="**.***-***"
                   id="address.postalCode"
                   {...register("address.postalCode")}
                 />
