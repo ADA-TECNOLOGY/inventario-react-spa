@@ -1,6 +1,7 @@
 import {
   Box,
   Container,
+  Divider,
   Drawer,
   DrawerBody,
   DrawerContent,
@@ -8,15 +9,23 @@ import {
   DrawerOverlay,
   Flex,
   Heading,
-  Link,
+  Text,
 } from "@chakra-ui/react";
 import { useAuth } from "../../hooks/auth";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import Header from "../Header";
+import { useState } from "react";
+import { MdOutlineContactPage, MdOutlineHome } from "react-icons/md";
+import { Linkhover } from "./style";
+import { Link } from "react-router-dom";
 
 export default function Sidebar({ children }: any) {
   const { token, isOpenSidebar, handleOpenSidebar } = useAuth();
   const isAuth = !!token;
+  const [menus] = useState([{ name: "Inicio", link: "/", icon: <MdOutlineHome/> }]);
+  const [menusRegister] = useState([
+    { name: "Fonecedores", link: "/supplier", icon: <MdOutlineContactPage/> },
+  ]);
 
   return (
     <>
@@ -46,22 +55,35 @@ export default function Sidebar({ children }: any) {
               </DrawerHeader>
               <DrawerBody>
                 <Flex direction="column" as="nav">
-                  <Link p={2} href="/">
-                    Inicio
-                  </Link>
-                  <Link p={2} href="#">
-                    Saidas
-                  </Link>
-                  <Link p={2} href="/supplier">
-                    Fornecedores
-                  </Link>
+                  {menus.map((e, index) => (
+                    <Linkhover as={Link} key={index} to={e.link}>
+                      <Flex alignItems={"center"} >
+                        {e.icon} 
+                        <Text ml={2}>{e.name}</Text> 
+
+                      </Flex>
+                    </Linkhover>
+                  ))}
+                  <Box mt={5} mb={3}>
+                    <Text color={'gray.600'} mb={2}>Cadastro</Text>
+                    <Divider bg={'gray.700'}/>
+                  </Box>
+
+                  {menusRegister.map((e, index) => (
+                    <Linkhover as={Link} key={index} to={e.link}>
+                      <Flex alignItems={"center"}>
+                        {e.icon} 
+                        <Text ml={2}>{e.name}</Text> 
+                      </Flex>
+                    </Linkhover>
+                  ))}
                 </Flex>
               </DrawerBody>
             </DrawerContent>
           </Drawer>
 
           <Box flex="1">
-            <Header ></Header>
+            <Header></Header>
             <Container
               transition="margin-left 0.3s ease-in-out"
               ml={isOpenSidebar ? { base: 0, md: "340px" } : ""}
