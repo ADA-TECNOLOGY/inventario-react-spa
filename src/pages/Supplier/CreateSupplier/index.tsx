@@ -134,7 +134,7 @@ export default function CreateSupplier() {
   };
 
   return (
-    <Container maxW="container.lg" mb="2%">
+    <Box mb="2%">
       <Breadcrumb fontWeight="medium" fontSize="lg">
         <BreadcrumbItem>
           <BreadcrumbLink as={Link} to="/supplier">
@@ -347,6 +347,6 @@ export default function CreateSupplier() {
           </Box>
         </CardBody>
       </Card>
-    </Container>
+    </Box>
   );
 }
