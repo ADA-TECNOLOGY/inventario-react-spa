@@ -7,6 +7,7 @@ import ForgotPassword from "../pages/auth/ForgotPassword";
 import Supplier from "../pages/Supplier";
 import CreateSupplier from "../pages/Supplier/CreateSupplier";
 import EditSupplier from "../pages/Supplier/EditSupplier";
+import Category from "../pages/Category";
 
 interface Props {
   children?: ReactNode;
@@ -56,6 +57,14 @@ const RouteApp = () => {
         element={
           <ProtectedRoute>
             <EditSupplier />
+          </ProtectedRoute>
+        }
+      />
+       <Route
+        path="/category"
+        element={
+          <ProtectedRoute>
+            <Category />
           </ProtectedRoute>
         }
       />
