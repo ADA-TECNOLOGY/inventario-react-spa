@@ -1,32 +1,103 @@
-import React from 'react';
-import { Box, Flex, Link, IconButton } from '@chakra-ui/react';
+import {
+  Box,
+  Container,
+  Divider,
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerHeader,
+  DrawerOverlay,
+  Flex,
+  Heading,
+  Text,
+} from "@chakra-ui/react";
+import { useAuth } from "../../hooks/auth";
+import { HamburgerIcon } from "@chakra-ui/icons";
+import Header from "../Header";
+import { useState } from "react";
+import { MdList, MdOutlineContactPage, MdOutlineHome } from "react-icons/md";
+import { Linkhover } from "./style";
+import { Link } from "react-router-dom";
 
+export default function Sidebar({ children }: any) {
+  const { token, isOpenSidebar, handleOpenSidebar } = useAuth();
+  const isAuth = !!token;
+  const [menus] = useState([{ name: "Inicio", link: "/", icon: <MdOutlineHome/> }]);
+  const [menusRegister] = useState([
+    { name: "Fonecedor", link: "/supplier", icon: <MdOutlineContactPage/> },
+    { name: "Categoria", link: "/category", icon: <MdList/> },
+  ]);
 
+  return (
+    <>
+      {isAuth ? (
+        <Flex height="100vh">
+          <Drawer
+            placement="left"
+            onClose={handleOpenSidebar}
+            isOpen={isOpenSidebar}
+          >
+            <DrawerOverlay bg="transparent" />
+            <DrawerContent>
+              <DrawerHeader
+                borderBottomColor={"teal"}
+                bg={"teal"}
+                borderBottomWidth="8px"
+              >
+                <Flex color={"#fff"}>
+                  <HamburgerIcon
+                    mr={5}
+                    fontSize={"20"}
+                    cursor={"pointer"}
+                    onClick={handleOpenSidebar}
+                  />
+                  <Heading size={"md"}>Inventário</Heading>
+                </Flex>
+              </DrawerHeader>
+              <DrawerBody>
+                <Flex direction="column" as="nav">
+                  {menus.map((e, index) => (
+                    <Linkhover as={Link} key={index} to={e.link}>
+                      <Flex alignItems={"center"} >
+                        {e.icon} 
+                        <Text ml={2}>{e.name}</Text> 
 
-export default function Sidebar() {
+                      </Flex>
+                    </Linkhover>
+                  ))}
+                  <Box mt={5} mb={3}>
+                    <Text color={'gray.600'} mb={2}>Cadastro</Text>
+                    <Divider bg={'gray.700'}/>
+                  </Box>
 
-    return (
-        <Box >
-            <Flex>
-                <Box
-                    w={{ base: 'full', md: '250px' }}
-                    pos="fixed"
-                    h="100%"
-                    zIndex={20}
-                >
-                    <Box p={5} w="100%" h="100%" bg={'white'} color={'teal'} boxShadow="lg" >
-                        <Flex direction="column" as="nav">
-                            <Link p={2} href="/home"> Inicio</Link>
-                            <Link p={2} href="#">Saidas</Link>
-                            
-                        </Flex>
-                    </Box>
-                </Box>
-                <Box ml={{ base: 0, md: '250px' }} p={4} flex="1">
-                    {/* Conteúdo Principal */}
-                </Box>
-            </Flex>
-        </Box>
-    );
-};
+                  {menusRegister.map((e, index) => (
+                    <Linkhover as={Link} key={index} to={e.link}>
+                      <Flex alignItems={"center"}>
+                        {e.icon} 
+                        <Text ml={2}>{e.name}</Text> 
+                      </Flex>
+                    </Linkhover>
+                  ))}
+                </Flex>
+              </DrawerBody>
+            </DrawerContent>
+          </Drawer>
 
+          <Box flex="1">
+            <Header></Header>
+            <Container
+              transition="margin-left 0.3s ease-in-out"
+              ml={isOpenSidebar ? { base: 0, md: "340px" } : ""}
+              maxW={isOpenSidebar ? "75%" : "85%"}
+              mt={20}
+            >
+              {children}
+            </Container>
+          </Box>
+        </Flex>
+      ) : (
+        <Box>{children}</Box>
+      )}
+    </>
+  );
+}
