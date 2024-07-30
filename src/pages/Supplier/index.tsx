@@ -18,18 +18,18 @@ import {
 import { useEffect, useState } from "react";
 import { MdCreate, MdDehaze } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { CreateSupplierFormData } from "./CreateSupplier/formSchema";
 import api from "../../services/api";
 import { Page } from "../../model/interface/pagination.interface";
 import Pagination from "../../components/PaginationGroupItems";
 import { formatDocument } from "../../util/masckDocument";
 import { formatPhone } from "../../util/maskPhone";
+import { SupplierModel } from "../../model/Supplier.model";
 
 export default function Supplier() {
   const navigate = useNavigate();
   const toast = useToast()
 
-  const [suppliers, setSuppliers] = useState<CreateSupplierFormData[]>([]);
+  const [suppliers, setSuppliers] = useState<SupplierModel[]>([]);
   const [pagination, setPagination] = useState<Page>({} as Page);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
@@ -98,7 +98,7 @@ export default function Supplier() {
               </Tr>
             </Thead>
             <Tbody>
-              {suppliers?.map((e: CreateSupplierFormData) => (
+              {suppliers?.map((e: SupplierModel) => (
                 <Tr key={e?.id}>
                   <Td>{e.corporateName}</Td>
                   <Td>{formatDocument(e.document)}</Td>

@@ -34,9 +34,11 @@ import { Page } from "../../model/interface/pagination.interface";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CreateCategoryFormData, createCategoryFormSchema } from "./formSchema";
+import { CategoryModel } from '../../model/Category.model';
+
 
 export default function Category() {
-  const { register, control, handleSubmit, formState, getValues, setValue, reset } =
+  const { register, handleSubmit, formState, setValue, reset } =
     useForm<CreateCategoryFormData>({
       resolver: yupResolver(createCategoryFormSchema) as any,
     });
@@ -44,9 +46,9 @@ export default function Category() {
   const [pagination, setPagination] = useState<Page>({} as Page);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [listCatagory, setListCategory] = useState([]);
-  const [isEdit, setIsEdit] = useState(false);
-  const [categorySelected, setCategorySelected] = useState<any>();
+  const [listCatagory, setListCategory] = useState<CategoryModel[]>([]);
+  const [isEdit, setIsEdit] = useState<boolean>(false);
+  const [categorySelected, setCategorySelected] = useState<CategoryModel>({} as CategoryModel);
   const { errors } = formState;
 
   // Funcao para trazer a listagem dos dados
@@ -99,7 +101,7 @@ export default function Category() {
   };
 
   // Funcao para abrir dialog de edicao
-  const editCategory = (category: any) => {
+  const editCategory = (category: CategoryModel) => {
     setIsEdit(true);
     setCategorySelected(category)
     setValue("name", category.name)
@@ -183,7 +185,7 @@ export default function Category() {
               </Tr>
             </Thead>
             <Tbody>
-              {listCatagory?.map((e: any) => (
+              {listCatagory?.map((e: CategoryModel) => (
                 <Tr key={e.id}>
                   <Td>{e.name}</Td>
                   <Td>
