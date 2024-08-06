@@ -12,7 +12,7 @@ export default function Home() {
     <>
       <SimpleGrid columns={3} spacing={10}>
         {menus.map((e, index) => (
-          <Link to={e.link}>
+          <Link key={index} to={e.link}>
             <Card key={index} >
               <CardBody >
                 <Text p={5}>{e.title}</Text>

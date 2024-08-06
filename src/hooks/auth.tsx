@@ -1,8 +1,11 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useState,
 } from "react";
+import { useNavigate } from "react-router-dom";
+import { setupInterceptors } from "../services/api";
 
 interface AuthContextData {
   token: object;
@@ -17,7 +20,7 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthProvider = ({ children }: any) => {
   const [data, setData] = useState<any | any>(localStorage.getItem("token") || "");
   const [openSidebar, setOpenSidebar] = useState<boolean>(false);
-
+  const navigate = useNavigate();
   const setToken = (token: string) => {
     localStorage.setItem("token", token);
     setData(token);
@@ -26,12 +29,16 @@ export const AuthProvider = ({ children }: any) => {
   const removeToken = () => {
     localStorage.removeItem("token");
     setData(null);
+    navigate("/signin")
   }
 
   const handleOpenSidebar = () => {
     setOpenSidebar(!openSidebar);
   }
 
+  useEffect(() => {
+    setupInterceptors(removeToken);
+  }, [removeToken]);
 
   return (
     <AuthContext.Provider value={{ token: data, isOpenSidebar: openSidebar, setToken, removeToken, handleOpenSidebar }}>

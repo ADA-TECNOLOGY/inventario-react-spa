@@ -9,19 +9,15 @@ import {
   MenuList,
   Spacer,
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/auth";
 import { HamburgerIcon } from "@chakra-ui/icons";
 
 export default function Header() {
   const isAuth = localStorage.getItem("token") != undefined;
-  const navigate = useNavigate();
   const { removeToken, handleOpenSidebar, isOpenSidebar } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
     removeToken();
-    navigate("/signin");
   };
 
   return (
