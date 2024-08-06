@@ -24,6 +24,8 @@ import { SignUpFormData, signUpFormSchema } from "./formSchema";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { StateModel } from "../../../model/State.model";
+import { CitiesModel } from "../../../model/Cities.model";
 
 export default function SignUp() {
   const {
@@ -38,8 +40,8 @@ export default function SignUp() {
   });
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [uf, setUf] = useState<string[]>([]);
-  const [cities, setCities] = useState<[]>([]);
+  const [uf, setUf] = useState<StateModel[]>([]);
+  const [cities, setCities] = useState<CitiesModel[]>([]);
   const [typeDocument, setTypeDocument] = useState("cnpj");
   const { errors } = formState;
 

@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   CardBody,
-  Container,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -26,6 +25,8 @@ import { useCallback, useEffect, useState } from "react";
 import api from "../../../services/api";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { StateModel } from "../../../model/State.model";
+import { CitiesModel } from "../../../model/Cities.model";
 
 export default function EditSupplier() {
   const { register, control, handleSubmit, formState, getValues, setValue } =
@@ -34,8 +35,8 @@ export default function EditSupplier() {
     });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [ufs, setUfs] = useState<any>([]);
-  const [cities, setCities] = useState<any>([]);
+  const [ufs, setUfs] = useState<StateModel[]>([]);
+  const [cities, setCities] = useState<CitiesModel[]>([]);
   const [typeDocument, setTypeDocument] = useState("cnpj");
   const { errors } = formState;
   const navigate = useNavigate();
