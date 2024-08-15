@@ -27,49 +27,83 @@ import { formatPhone } from "../../util/maskPhone";
 import { SupplierModel } from "../../model/Supplier.model";
 import FilterSupplier from "./components/FilterSupplier";
 
+interface FildsFilter {
+  corporateName: string;
+  document: string;
+  active: string;
+}
+
 export default function Supplier() {
   const navigate = useNavigate();
-  const toast = useToast()
+  const toast = useToast();
 
   const [suppliers, setSuppliers] = useState<SupplierModel[]>([]);
   const [pagination, setPagination] = useState<Page>({} as Page);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  const [filter, setFilter] = useState<FildsFilter>({} as FildsFilter);
 
-  const handleDataSupplier = async (page: number, size?: number, document?: string, corporateName?: string, active?: string) => {
+  const handleDataSupplier = async (
+    page: number,
+    size?: number,
+    document?: string,
+    corporateName?: string,
+    active?: string
+  ) => {
     try {
-      const resp = await api.get(`/supplier/page?page=${page}&size=${size}&document=${document}&corporateName=${corporateName}&active=${active}`);
+      const resp = await api.get(
+        `/supplier/page?page=${page}&size=${size}&document=${
+          document || ""
+        }&corporateName=${corporateName || ""}&active=${active || ""}`
+      );
       setItemsPerPage(size || 10); // quantidade de item por página
-      setSuppliers(resp.data.content) 
-      setPagination(resp.data) // Receber objeto referente a páginação
-    }catch(error){
-      console.error("Error ao buscar dados fornecedores", error)
+      setSuppliers(resp.data.content);
+      setPagination(resp.data); // Receber objeto referente a páginação
+      setFilter({
+        document: document || "",
+        corporateName: corporateName || "",
+        active: active || "",
+      });
+    } catch (error) {
+      console.error("Error ao buscar dados fornecedores", error);
     }
-  }
+  };
 
-  const enableDisableSupplier = async (idSupplier:number) => {
+  const enableDisableSupplier = async (idSupplier: number) => {
     try {
       const resp = await api.patch(`/supplier/disableOrActivate/${idSupplier}`);
-        if(resp.status == 200) {
-          toast({
-            
-            description: `${resp.data.active 
-              ? "Fornecedor ativado com sucesso!" 
-              : "Fornecedor desativado com sucesso!"}`,
-            status: 'success',
-            duration: 3000,
-            isClosable: true,
-          })
-          handleDataSupplier(pagination?.number, itemsPerPage, '', '', '')
-        }
-    }catch(error) {
-      console.error("Erro ao atualizar.", error)
+      if (resp.status == 200) {
+        toast({
+          description: `${
+            resp.data.active
+              ? "Fornecedor ativado com sucesso!"
+              : "Fornecedor desativado com sucesso!"
+          }`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        handleDataSupplier(
+          pagination?.number,
+          itemsPerPage,
+          filter.document,
+          filter.corporateName,
+          filter.active
+        );
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar.", error);
     }
-  }
+  };
 
   useEffect(() => {
-    handleDataSupplier(0, 10, '', '', '')
-  }, [])
-
+    handleDataSupplier(
+      0,
+      10,
+      filter.document,
+      filter.corporateName,
+      filter.active
+    );
+  }, []);
 
   return (
     <Box>
@@ -78,14 +112,15 @@ export default function Supplier() {
           Fornecedores
         </Heading>
         <Spacer />
+        <FilterSupplier handleFilter={handleDataSupplier} />
         <Button
           colorScheme="teal"
           variant="outline"
+          ml={2}
           onClick={() => navigate("/supplier/create")}
         >
           Novo +{" "}
         </Button>
-        <FilterSupplier handleFilter={handleDataSupplier}/>
       </Flex>
       <Box borderRadius={5} mt={5} bg={"white"}>
         <TableContainer>
@@ -96,7 +131,9 @@ export default function Supplier() {
                 <Th textAlign="center">CNPJ/CPF</Th>
                 <Th textAlign="center">Fone</Th>
                 <Th textAlign="center">Ativar / Inativar</Th>
-                <Th textAlign="right" display="flex" ml={9}>Ações</Th>
+                <Th textAlign="right" display="flex" ml={9}>
+                  Ações
+                </Th>
               </Tr>
             </Thead>
             <Tbody>
@@ -106,31 +143,36 @@ export default function Supplier() {
                   <Td>{formatDocument(e.document)}</Td>
                   <Td>{formatPhone(e.phone)}</Td>
                   <Tooltip label={e.active ? "Inativar" : "Ativar"}>
-                  <Td display="flex" justifyContent="center" alignItems="center">
-                  <Switch 
-                      onChange={()=>enableDisableSupplier(e.id)}
-                      isChecked={e.active}
-                      colorScheme="teal" />
-                  </Td>
+                    <Td
+                      display="flex"
+                      justifyContent="center"
+                      alignItems="center"
+                    >
+                      <Switch
+                        onChange={() => enableDisableSupplier(e.id)}
+                        isChecked={e.active}
+                        colorScheme="teal"
+                      />
+                    </Td>
                   </Tooltip>
                   <Td textAlign="right">
-                    <Tooltip label='Detalhe'>
-                    <IconButton
-                      bg={"white"}
-                      aria-label={"Detalhe"}
-                      color={"teal"}
-                      icon={<MdDehaze />}
-                      mr={1}
-                    ></IconButton>
+                    <Tooltip label="Detalhe">
+                      <IconButton
+                        bg={"white"}
+                        aria-label={"Detalhe"}
+                        color={"teal"}
+                        icon={<MdDehaze />}
+                        mr={1}
+                      ></IconButton>
                     </Tooltip>
-                    <Tooltip label='Editar'>
-                    <IconButton
-                      onClick={()=> navigate(`/supplier/${e.id}`)}
-                      bg={"white"}
-                      aria-label={"Editar"}
-                      color={"teal"}
-                      icon={<MdCreate />}
-                    ></IconButton>
+                    <Tooltip label="Editar">
+                      <IconButton
+                        onClick={() => navigate(`/supplier/${e.id}`)}
+                        bg={"white"}
+                        aria-label={"Editar"}
+                        color={"teal"}
+                        icon={<MdCreate />}
+                      ></IconButton>
                     </Tooltip>
                   </Td>
                 </Tr>
@@ -139,12 +181,12 @@ export default function Supplier() {
           </Table>
           {/* Componente de páginação */}
           <Pagination
-          currentPage={pagination?.number || 0}
-          totalPages={pagination?.totalPages || 0}
-          onPageChange={handleDataSupplier}
-          itemsPerPage={itemsPerPage}
-          onItemsPerPageChange={handleDataSupplier}
-        />
+            currentPage={pagination?.number || 0}
+            totalPages={pagination?.totalPages || 0}
+            onPageChange={handleDataSupplier}
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={handleDataSupplier}
+          />
         </TableContainer>
       </Box>
     </Box>
