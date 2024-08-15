@@ -22,6 +22,7 @@ import {
   Td,
   Th,
   Thead,
+  Tooltip,
   Tr,
   useDisclosure,
 } from "@chakra-ui/react";
@@ -186,25 +187,28 @@ export default function Category() {
             </Thead>
             <Tbody>
               {listCatagory?.map((e: CategoryModel) => (
-                <Tr key={e.id}>
+                <Tr key={e.id} _hover={{ bg: "gray.100" }}>
                   <Td>{e.name}</Td>
                   <Td>
-                    <IconButton
+                  <Tooltip label='Editar'>
+                  <IconButton
                       bg={"white"}
-                      title="Editar"
                       onClick={() => editCategory(e)}
                       aria-label={"Detalhe"}
                       color={"teal"}
                       icon={<MdEdit />}
+                      mr={1}
                     ></IconButton>
-                    <IconButton
+                  </Tooltip>
+                  <Tooltip label='Deletar'>
+                  <IconButton
                       onClick={() => handleDelete(e.id)}
                       bg={"white"}
-                      title="Deletar"
                       aria-label={"Deletar"}
                       color={"teal"}
                       icon={<MdDelete />}
                     ></IconButton>
+                  </Tooltip>
                   </Td>
                 </Tr>
               ))}

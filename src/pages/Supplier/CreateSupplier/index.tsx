@@ -27,6 +27,7 @@ import { Link, useNavigate } from "react-router-dom";
 import api from "../../../services/api";
 import { StateModel } from "../../../model/State.model";
 import { CitiesModel } from "../../../model/Cities.model";
+import { InputMask } from "@react-input/mask";
 
 export default function CreateSupplier() {
   const { register, control, handleSubmit, formState, getValues, setValue } =
@@ -131,6 +132,7 @@ export default function CreateSupplier() {
 
   //usada para atualizar o estado typeDocument com um novo valor
   const handleTypeDocumentChange = (value: any) => {
+    setValue('document', '')
     setTypeDocument(value);
   };
 
@@ -200,6 +202,8 @@ export default function CreateSupplier() {
                   control={control}
                   render={({ field }) => (
                     <Input
+                    as={InputMask}
+                      mask={typeDocument === "cnpj" ? "99.999.999/9999-99" : "999.999.999-99"}
                       id="document"
                       {...field}
                     />
@@ -219,6 +223,8 @@ export default function CreateSupplier() {
               <FormControl isInvalid={!!errors.phone}>
                 <FormLabel>Fone</FormLabel>
                 <Input
+                  as={InputMask}
+                  mask="(__)_____-____"
                   type="tel"
                   id="phone"
                   {...register("phone")}
@@ -244,6 +250,10 @@ export default function CreateSupplier() {
               <FormControl isInvalid={!!errors?.address?.postalCode}>
                 <FormLabel>Cep</FormLabel>
                 <Input
+                  as={InputMask}
+                  mask="__.___-___"
+                  replacement={{ _: /\d/ }}
+                  showMask={true}
                   onKeyDown={handlePostalCodeSearch}
                   id="address.postalCode"
                   {...register("address.postalCode")}
