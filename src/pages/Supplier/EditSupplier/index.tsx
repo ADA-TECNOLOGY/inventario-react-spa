@@ -27,6 +27,12 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { StateModel } from "../../../model/State.model";
 import { CitiesModel } from "../../../model/Cities.model";
+import MaskedInput from "react-text-mask";
+import { cepMask, cnpjMask, cpfMask, phoneNumberMask } from "../../../util/masksInput";
+import { SupplierModel } from "../../../model/Supplier.model";
+import { formatPostalCode } from "../../../util/formatPostalCode";
+import { formatPhone } from "../../../util/formatPhone";
+import { formatDocument } from "../../../util/formatDocument";
 
 export default function EditSupplier() {
   const { register, control, handleSubmit, formState, getValues, setValue } =
@@ -47,16 +53,21 @@ export default function EditSupplier() {
     try {
       const resp = await api.get(`/supplier/${id}`);
       const supplier = resp.data;
-      setValue("corporateName", supplier.corporateName);
-      setValue("tradeName", supplier.tradeName);
-      setValue("document", supplier.document);
-      setValue("phone", supplier.phone);
-      setValue("email", supplier.email);
-      setValue("address", supplier.address);
+      prepareFields(supplier)
     } catch (error) {
       console.error("Erro ao buscar dados", error);
     }
   };
+
+  const prepareFields = (supplier : SupplierModel) => {
+    setValue("corporateName", supplier.corporateName);
+    setValue("tradeName", supplier.tradeName);
+    setValue("document",  formatDocument(supplier.document));
+    setValue("phone", formatPhone(supplier.phone));
+    setValue("email", supplier.email);
+    setValue("address", supplier.address);
+    setValue("address.postalCode", formatPostalCode(supplier.address.postalCode))
+  }
 
   //Salva o dados do fornecedor
   const handleUpdateSupplier: SubmitHandler<EditSupplierFormData> = useCallback(
@@ -220,7 +231,14 @@ export default function EditSupplier() {
                 <Controller
                   name="document"
                   control={control}
-                  render={({ field }) => <Input id="document" {...field} />}
+                  render={({ field }) => (
+                    <Input
+                      as={MaskedInput}
+                      mask={typeDocument === "cnpj" ? cnpjMask : cpfMask}
+                      id="document"
+                      {...field}
+                    />
+                  )}
                 />
                 {errors.document && (
                   <FormErrorMessage>{errors.document.message}</FormErrorMessage>
@@ -235,7 +253,20 @@ export default function EditSupplier() {
             >
               <FormControl isInvalid={!!errors.phone}>
                 <FormLabel>Fone</FormLabel>
-                <Input type="tel" id="phone" {...register("phone")} />
+                <Controller
+                  name="phone"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      as={MaskedInput}
+                      mask={phoneNumberMask}
+                      onKeyDown={handlePostalCodeSearch}
+                      id="phone"
+                      type="text"
+                      {...field}
+                    />
+                  )}
+                />
                 {errors.phone && (
                   <FormErrorMessage>{errors.phone.message}</FormErrorMessage>
                 )}
@@ -256,10 +287,19 @@ export default function EditSupplier() {
             >
               <FormControl isInvalid={!!errors?.address?.postalCode}>
                 <FormLabel>Cep</FormLabel>
-                <Input
-                  onKeyDown={handlePostalCodeSearch}
-                  id="address.postalCode"
-                  {...register("address.postalCode")}
+                <Controller
+                  name="address.postalCode"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      as={MaskedInput}
+                      mask={cepMask}
+                      onKeyDown={handlePostalCodeSearch}
+                      id="address.postalCode"
+                      type="text"
+                      {...field}
+                    />
+                  )}
                 />
                 {errors?.address?.postalCode && (
                   <FormErrorMessage>

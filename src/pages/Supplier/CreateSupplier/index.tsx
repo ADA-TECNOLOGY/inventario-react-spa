@@ -27,6 +27,8 @@ import { Link, useNavigate } from "react-router-dom";
 import api from "../../../services/api";
 import { StateModel } from "../../../model/State.model";
 import { CitiesModel } from "../../../model/Cities.model";
+import MaskedInput from 'react-text-mask'
+import { cepMask, cnpjMask, cpfMask, phoneNumberMask } from "../../../util/masksInput";
 
 export default function CreateSupplier() {
   const { register, control, handleSubmit, formState, getValues, setValue } =
@@ -132,6 +134,7 @@ export default function CreateSupplier() {
   //usada para atualizar o estado typeDocument com um novo valor
   const handleTypeDocumentChange = (value: any) => {
     setTypeDocument(value);
+    setValue("document", "")
   };
 
   return (
@@ -200,6 +203,8 @@ export default function CreateSupplier() {
                   control={control}
                   render={({ field }) => (
                     <Input
+                      as={MaskedInput}
+                      mask={typeDocument === "cnpj" ? cnpjMask : cpfMask}
                       id="document"
                       {...field}
                     />
@@ -218,10 +223,19 @@ export default function CreateSupplier() {
             >
               <FormControl isInvalid={!!errors.phone}>
                 <FormLabel>Fone</FormLabel>
-                <Input
-                  type="tel"
-                  id="phone"
-                  {...register("phone")}
+                <Controller
+                  name="phone"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      as={MaskedInput}
+                      mask={phoneNumberMask}
+                      onKeyDown={handlePostalCodeSearch}
+                      id="phone"
+                      type="text"
+                      {...field}
+                    />
+                  )}
                 />
                 {errors.phone && (
                   <FormErrorMessage>{errors.phone.message}</FormErrorMessage>
@@ -243,10 +257,19 @@ export default function CreateSupplier() {
             >
               <FormControl isInvalid={!!errors?.address?.postalCode}>
                 <FormLabel>Cep</FormLabel>
-                <Input
-                  onKeyDown={handlePostalCodeSearch}
-                  id="address.postalCode"
-                  {...register("address.postalCode")}
+                <Controller
+                  name="address.postalCode"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      as={MaskedInput}
+                      mask={cepMask}
+                      onKeyDown={handlePostalCodeSearch}
+                      id="address.postalCode"
+                      type="text"
+                      {...field}
+                    />
+                  )}
                 />
                 {errors?.address?.postalCode && (
                   <FormErrorMessage>

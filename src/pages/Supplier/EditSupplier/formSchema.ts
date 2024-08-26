@@ -15,7 +15,7 @@ export const editSupplierFormSchema = yup.object().shape({
   address: yup.object().shape({
     postalCode: yup.string().required("Campo obrigatório"),
     street: yup.string().required("Campo obrigatório"),
-    number: yup.string().required("Campo obrigatório"),
+    number: yup.number().required("Campo obrigatório"),
     district: yup.string().required("Campo obrigatório"),
     city: yup.string().required("Campo obrigatório"),
     state: yup.string().required("Campo obrigatório"),
@@ -26,7 +26,7 @@ export const editSupplierFormSchema = yup.object().shape({
 export type  Address = {
   postalCode: string;
   street: string;
-  number: string;
+  number: number;
   district: string;
   city: string;
   state: string;

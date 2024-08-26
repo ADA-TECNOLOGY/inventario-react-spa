@@ -21,8 +21,8 @@ import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { Page } from "../../model/interface/pagination.interface";
 import Pagination from "../../components/PaginationGroupItems";
-import { formatDocument } from "../../util/masckDocument";
-import { formatPhone } from "../../util/maskPhone";
+import { formatDocument } from "../../util/formatDocument";
+import { formatPhone } from "../../util/formatPhone";
 import { SupplierModel } from "../../model/Supplier.model";
 
 export default function Supplier() {
