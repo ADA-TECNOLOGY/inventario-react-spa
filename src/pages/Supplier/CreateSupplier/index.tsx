@@ -133,6 +133,7 @@ export default function CreateSupplier() {
 
   //usada para atualizar o estado typeDocument com um novo valor
   const handleTypeDocumentChange = (value: any) => {
+    setValue('document', '')
     setTypeDocument(value);
     setValue("document", "")
   };
