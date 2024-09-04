@@ -10,6 +10,7 @@ import EditSupplier from "../pages/Supplier/EditSupplier";
 import Category from "../pages/Category";
 import Customer from "../pages/Customer";
 import CreateCustomer from "../pages/Customer/CreateCustomer";
+import EditCustomer from "../pages/Customer/EditCustomer";
 
 
 interface Props {
@@ -87,14 +88,14 @@ const RouteApp = () => {
           </ProtectedRoute>
         }
       />
-      {/* <Route
+      <Route
         path="/costumer/:id"
         element={
           <ProtectedRoute>
-            <EditSupplier />
+            <EditCustomer />
           </ProtectedRoute>
         }
-      /> */}
+      />
     </Routes>
   );
 };
