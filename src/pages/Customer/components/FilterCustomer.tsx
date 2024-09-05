@@ -18,22 +18,22 @@ import {
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
 import { MdFilterList } from "react-icons/md";
-import { FilterSupplierFormData, filterSupplierFormSchema } from "./formSchema";
+import { filterCostumerFormSchema, FilterCustomerFormData } from "./formSchema";
 import MaskedInput from "react-text-mask";
 import { cpfMask } from "../../../util/masksInput";
 
-export default function FilterSupplier({ handleFilter }: any) {
+export default function FilterCostumer({ handleFilter }: any) {
   const { register, control, getValues, reset } =
-    useForm<FilterSupplierFormData>({
-      resolver: yupResolver(filterSupplierFormSchema) as any,
+    useForm<FilterCustomerFormData>({
+      resolver: yupResolver(filterCostumerFormSchema) as any,
     });
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleSubmitFilter = () => {
-    const corporateName = getValues().corporateName;
+    const name = getValues().name;
     const document = getValues().document?.replace(/[.\-/() ]/g, "");
     const active = getValues().active;
-    handleFilter(0, 10, document, corporateName, active);
+    handleFilter(0, 10, active, document, name);
     reset();
   };
 
@@ -48,7 +48,7 @@ export default function FilterSupplier({ handleFilter }: any) {
         <DrawerOverlay />
         <DrawerContent>
           <DrawerCloseButton />
-          <DrawerHeader>Filtrar Fornecedor</DrawerHeader>
+          <DrawerHeader>Filtrar Cliente</DrawerHeader>
           <DrawerBody>
             <Box
               as="form"
@@ -61,7 +61,7 @@ export default function FilterSupplier({ handleFilter }: any) {
             >
               <FormControl>
                 <FormLabel>Nome</FormLabel>
-                <Input {...register("corporateName")} />
+                <Input {...register("name")} />
               </FormControl>
               <FormControl>
                 <FormLabel>CPF/CNPJ</FormLabel>
@@ -72,8 +72,7 @@ export default function FilterSupplier({ handleFilter }: any) {
                     <Input
                       as={MaskedInput}
                       mask={cpfMask}
-                      id="document"
-                      {...register("document")}
+                      id="document" {...register("document")}
                       {...field}
                     />
                   )}

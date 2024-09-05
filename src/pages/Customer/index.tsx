@@ -26,11 +26,13 @@ import { CustomerModel } from "../../model/Customer.model";
 import api from "../../services/api";
 import { formatPhone } from "../../util/formatPhone";
 import { formatDocument } from "../../util/formatDocument";
+import FilterCostumer from "./components/FilterCustomer";
 
 interface FildsFilter {
-    name: string;
-    document: string;
-  }
+  name: string;
+  document: string;
+  active: string;
+}
 
 export default function Customer() {
   const navigate = useNavigate();
@@ -44,13 +46,14 @@ export default function Customer() {
   const handleDataCustomer = async (
     page: number,
     size?: number,
+    active?: string,
     document?: string,
-    name?: string,
+    name?: string
   ) => {
     try {
       const resp = await api.get(
-        `/customer?page=${page}&size=${size}&document=${
-          document || ""}&name=${name || ""} `
+        `/customer?page=${page}&size=${size}&document=${document || ""}&name=${
+          name || ""} `
       );
       setItemsPerPage(size || 10); // quantidade de item por página
       setCustomer(resp.data.content);
@@ -58,6 +61,7 @@ export default function Customer() {
       setFilter({
         document: document || "",
         name: name || "",
+        active: active || ""
       });
     } catch (error) {
       console.error("Error ao buscar dados dos clientes", error);
@@ -65,39 +69,36 @@ export default function Customer() {
   };
 
   //Funcao de desativar cliente
-  const enableDisableCustomer = async(idCustomer: number) => {
+  const enableDisableCustomer = async (idCustomer: number) => {
     try {
-      const resp = await api.patch(`/customer/disableOrActivate/${idCustomer}`)
-        if (resp.status == 200) {
-          toast({
-            description: `${
+      const resp = await api.patch(`/customer/disableOrActivate/${idCustomer}`);
+      if (resp.status == 200) {
+        toast({
+          description: `${
             resp.data.active
-            ? "Cliente ativado com sucesso!"
-            : "Cliente desativado com sucesso!"
-            }`,
-            status: "success",
-            duration: 3000,
-            isClosable: true,
-          })
-          handleDataCustomer(
-            pagination?.number,
-            itemsPerPage,
-            filter.document,
-            filter.name
-          )
-        }
-    } catch(error) {
-      console.error("Erro ao atualizar.", error)
+              ? "Cliente ativado com sucesso!"
+              : "Cliente desativado com sucesso!"
+          }`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        handleDataCustomer(
+          pagination?.number,
+          itemsPerPage,
+          filter.active,
+          filter.document,
+          filter.name,
+          
+        );
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar.", error);
     }
-  }
+  };
 
   useEffect(() => {
-    handleDataCustomer(
-      0,
-      10,
-      filter.document,
-      filter.name,
-    );
+    handleDataCustomer(0, 10, filter.document, filter.name);
   }, []);
 
   return (
@@ -107,7 +108,7 @@ export default function Customer() {
           Clientes
         </Heading>
         <Spacer />
-        <FilterSupplier handleFilter={handleDataCustomer} />
+        <FilterCostumer handleFilter={handleDataCustomer} />
         <Button
           colorScheme="teal"
           variant="outline"
@@ -127,53 +128,41 @@ export default function Customer() {
                 <Th textAlign="center">Fone</Th>
                 <Th textAlign="center">E-mail</Th>
                 <Th textAlign="center">Ativar / Inativar</Th>
-                <Th textAlign="right" display="flex" ml={9}> Ações</Th>
+                <Th textAlign="center"> Ações</Th>
               </Tr>
             </Thead>
             <Tbody>
               {customer?.map((e: CustomerModel) => (
-                <Tr key={(e?.id)} _hover={{ bg: "gray.100" }}>
-                <Td>{e.name}</Td>
-                <Td textAlign="center">{formatDocument(e.document)}</Td>
-                <Td textAlign="center">{formatPhone(e.phone)}</Td>
-                <Td textAlign="center">{e.email}</Td>
-                <Tooltip label={e.active ? "Inativar" : "Ativar"}>
-                    <Td
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="center"
-                    >
+                <Tr key={e?.id} _hover={{ bg: "gray.100" }}>
+                  <Td>{e.name}</Td>
+                  <Td textAlign="center">{formatDocument(e.document)}</Td>
+                  <Td textAlign="center">{formatPhone(e.phone)}</Td>
+                  <Td textAlign="center">{e.email}</Td>
+                  <Td
+                    textAlign="center"
+                  >
+                    <Tooltip label={e.active ? "Inativar" : "Ativar"}>
                       <Switch
                         onChange={() => enableDisableCustomer(e.id)}
                         isChecked={e.active}
                         colorScheme="teal"
                       />
-                    </Td>
-                  </Tooltip>
-                <Td textAlign="center">
-                  <Tooltip label="Editar">
-                    <IconButton
-                      mr={2}
-                      onClick={() => navigate(`/costumer/${e.id}`)}
-                      bg={"white"}
-                      aria-label={"Editar"}
-                      color={"teal"}
-                      icon={<MdCreate />}
-                    ></IconButton>
-                  </Tooltip>
-                  <Tooltip label="Excluir">
-                    <IconButton
-                      mr={2}
-                      bg={"white"}
-                      aria-label={"Detalhe"}
-                      color={"teal"}
-                      icon={<MdDelete />}
-                    ></IconButton>
-                  </Tooltip>
-                </Td>
-              </Tr>
+                    </Tooltip>
+                  </Td>
+                  <Td>
+                    <Tooltip label="Editar">
+                      <IconButton
+                        mr={2}
+                        onClick={() => navigate(`/costumer/${e.id}`)}
+                        bg={"white"}
+                        aria-label={"Editar"}
+                        color={"teal"}
+                        icon={<MdCreate />}
+                      ></IconButton>
+                    </Tooltip>
+                  </Td>
+                </Tr>
               ))}
-              
             </Tbody>
           </Table>
           {/* Componente de páginação */}

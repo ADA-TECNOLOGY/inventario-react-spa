@@ -11,8 +11,11 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
+  Radio,
+  RadioGroup,
   Select,
   SimpleGrid,
+  Stack,
   Text,
 } from "@chakra-ui/react";
 import { CreateCustomerFormData, createCustomerFormSchema, Address } from './formSchema';
@@ -155,30 +158,31 @@ export default function CreateCustomer() {
       <Card mt={5}>
         <CardBody textAlign={"center"}>
           <Box as="form" onSubmit={handleSubmit(handleCreateCustomer)} mt={5}>
-            <SimpleGrid
-              mt={3}
-              columns={3}
-              spacing={5}
-              templateColumns={"5fr 5fr"}
-            >
-              <FormControl isInvalid={!!errors.name}>
-                <FormLabel>Nome</FormLabel>
-                <Input id="name" {...register("name")} />
-                {errors.name && (
-                  <FormErrorMessage>
-                    {errors.name.message}
-                  </FormErrorMessage>
-                )}
-              </FormControl>
+          <SimpleGrid
+               alignItems={"center"}
+               columns={3}
+               spacing={5}
+               templateColumns="1fr 3fr 5fr"
+               >
+                <RadioGroup
+                mt={6}
+                value={typeDocument}
+                onChange={handleTypeDocumentChange}
+              >
+                <Stack direction="row">
+                  <Radio value="cnpj">CNPJ</Radio>
+                  <Radio value="cpf">CPF</Radio>
+                </Stack>
+              </RadioGroup>
               <FormControl isInvalid={!!errors.document}>
-                <FormLabel>CPF</FormLabel>
+                <FormLabel>{typeDocument === "cnpj" ? "CNPJ" : "CPF"}</FormLabel>
                 <Controller
                   name="document"
                   control={control}
                   render={({ field }) => (
                     <Input
                       as={MaskedInput}
-                      mask={cpfMask}
+                      mask={ typeDocument === "cnpj" ? cnpjMask : cpfMask}
                       id="document" {...register("document")}
                       {...field}
                     />
@@ -187,6 +191,15 @@ export default function CreateCustomer() {
                 {errors.document && (
                   <FormErrorMessage>
                     {errors.document.message}
+                  </FormErrorMessage>
+                )}
+              </FormControl>
+              <FormControl isInvalid={!!errors.name}>
+                <FormLabel>Nome</FormLabel>
+                <Input id="name" {...register("name")} />
+                {errors.name && (
+                  <FormErrorMessage>
+                    {errors.name.message}
                   </FormErrorMessage>
                 )}
               </FormControl>
