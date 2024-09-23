@@ -21,12 +21,18 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useCallback, useEffect, useState } from "react";
 import { SignUpFormData, signUpFormSchema } from "./formSchema";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { StateModel } from "../../../model/State.model";
 import { CitiesModel } from "../../../model/Cities.model";
-import ValidateCode from "./components/ValidateCode";
+import {
+  cepMask,
+  cnpjMask,
+  cpfMask,
+  phoneNumberMask,
+} from "../../../util/masksInput";
+import MaskedInput from "react-text-mask";
 
 export default function SignUp() {
   const { register, control, handleSubmit, getValues, formState, setValue } =
@@ -37,9 +43,8 @@ export default function SignUp() {
   const [uf, setUf] = useState<StateModel[]>([]);
   const [cities, setCities] = useState<CitiesModel[]>([]);
   const [typeDocument, setTypeDocument] = useState("cnpj");
-  const [isPageSendCode, setIsPageSendCode] = useState<boolean>(false);
-
   const { errors } = formState;
+  const navigate = useNavigate();
 
   //Funcao para salvar empresa (post)
   const handleSignUp: SubmitHandler<SignUpFormData> = useCallback(
@@ -51,7 +56,7 @@ export default function SignUp() {
           ...values,
           postalCode: values.postalCode.replace(/\D/g, ""),
           phone: values.phone.replace(/\D/g, ""),
-          cnpj: values.cnpj.replace(/[.\-/() ]/g, ""),
+          cnpj: values.document.replace(/[.\-/() ]/g, ""),
         };
 
         await axios.post("http://localhost:8080/company", formData);
@@ -62,7 +67,8 @@ export default function SignUp() {
           timer: 3000,
         });
         setTimeout(() => {
-          setIsPageSendCode(true);
+          navigate("/validatecode");
+          localStorage.setItem("emailValidate", values.email)
         }, 3000);
       } catch (error: any) {
         const data = error.response.data;
@@ -144,19 +150,23 @@ export default function SignUp() {
   //Funcao para atualizar o estado typedocument com novo valor
   const handleTypeDocumentChange = (value: any) => {
     setTypeDocument(value);
+    setValue("document", "");
   };
 
   return (
-    <Container  mt={isPageSendCode ? "10%" : ""} maxW={isPageSendCode ? "container.sm" : "container.md"} mb="2%">
-      <Card >
+    <Container
+      maxW={"container.md"}
+      mb="2%"
+    >
+      <Card>
         <CardBody textAlign="center">
           <Heading color="teal" size="md">
             Inventário
           </Heading>
-          {!isPageSendCode && <Text color="gray.400" size="sm">
-           Cadastrar uma conta
-          </Text>}
-          {!isPageSendCode ? (
+         
+            <Text color="gray.400" size="sm">
+              Cadastrar uma conta
+            </Text>
             <Box as="form" onSubmit={handleSubmit(handleSignUp)} mt="5">
               <SimpleGrid
                 mt={2}
@@ -199,19 +209,26 @@ export default function SignUp() {
                     <Radio value="cpf">CPF</Radio>
                   </Stack>
                 </RadioGroup>
-                <FormControl isInvalid={!!errors.cnpj}>
+                <FormControl isInvalid={!!errors.document}>
                   <FormLabel>
                     {typeDocument === "cnpj" ? "CNPJ" : "CPF"}
                   </FormLabel>
                   <Controller
-                    name="cnpj"
+                    name="document"
                     control={control}
                     render={({ field }) => (
-                      <Input {...register("cnpj")} id="cnpj" {...field} />
+                      <Input
+                        as={MaskedInput}
+                        mask={typeDocument === "cnpj" ? cnpjMask : cpfMask}
+                        id="document"
+                        {...field}
+                      />
                     )}
                   />
-                  {errors.cnpj && (
-                    <FormErrorMessage>{errors.cnpj.message}</FormErrorMessage>
+                  {errors.document && (
+                    <FormErrorMessage>
+                      {errors.document.message}
+                    </FormErrorMessage>
                   )}
                 </FormControl>
               </SimpleGrid>
@@ -230,7 +247,20 @@ export default function SignUp() {
                 </FormControl>
                 <FormControl isInvalid={!!errors.phone}>
                   <FormLabel>Fone</FormLabel>
-                  <Input type="tel" id="phone" {...register("phone")} />
+                  <Controller
+                    name="phone"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        as={MaskedInput}
+                        mask={phoneNumberMask}
+                        onKeyDown={handlePostalCodeSearch}
+                        id="phone"
+                        type="text"
+                        {...field}
+                      />
+                    )}
+                  />
                   {errors.phone && (
                     <FormErrorMessage>{errors.phone.message}</FormErrorMessage>
                   )}
@@ -244,10 +274,19 @@ export default function SignUp() {
               >
                 <FormControl isInvalid={!!errors.postalCode}>
                   <FormLabel>Cep</FormLabel>
-                  <Input
-                    onKeyDown={handlePostalCodeSearch}
-                    id="postalCode"
-                    {...register("postalCode")}
+                  <Controller
+                    name="postalCode"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        as={MaskedInput}
+                        mask={cepMask}
+                        onKeyDown={handlePostalCodeSearch}
+                        id="postalCode"
+                        type="text"
+                        {...field}
+                      />
+                    )}
                   />
                   {errors.postalCode && (
                     <FormErrorMessage>
@@ -383,10 +422,7 @@ export default function SignUp() {
               <Flex mt={5} color={"blue.400"}>
                 <Link to={"/signin"}>Já possui conta?</Link>
               </Flex>
-            </Box>
-          ) : (
-            <ValidateCode  email={getValues().email || "annavitoria@gmail.com"}/>
-          )}
+            </Box>       
         </CardBody>
       </Card>
     </Container>

@@ -1,13 +1,9 @@
 import * as yup from "yup";
 
 export const signUpFormSchema = yup.object().shape({
-  cnpj: yup
+  document: yup
     .string()
-    .required("Campo obrigatório")
-    .matches(
-      /^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}\-?\d{2}$/,
-      "Formato de CNPJ inválido"
-    ),
+    .required("Campo obrigatório"),
   corporateName: yup.string().required("Campo obrigatório"), //razaoSocial
   tradeName: yup.string().required("Campo obrigatório"), //nomeFantasia
   email: yup.string().required("Campo obrigatório").email("E-mail inválido"),
@@ -29,7 +25,7 @@ export const signUpFormSchema = yup.object().shape({
 });
 
 export type SignUpFormData = {
-  cnpj: string;
+  document: string;
   corporateName: string;
   tradeName: string;
   email: string;
