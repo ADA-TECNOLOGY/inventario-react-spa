@@ -30,7 +30,6 @@ import FilterSupplier from "./components/FilterSupplier";
 interface FildsFilter {
   corporateName: string;
   document: string;
-  active: string;
 }
 
 export default function Supplier() {
@@ -47,21 +46,20 @@ export default function Supplier() {
     size?: number,
     document?: string,
     corporateName?: string,
-    active?: string
+   
   ) => {
     try {
       const resp = await api.get(
         `/supplier/page?page=${page}&size=${size}&document=${
           document || ""
-        }&corporateName=${corporateName || ""}&active=${active || ""}`
+        }&corporateName=${corporateName || ""}`
       );
       setItemsPerPage(size || 10); // quantidade de item por página
       setSuppliers(resp.data.content);
       setPagination(resp.data); // Receber objeto referente a páginação
       setFilter({
         document: document || "",
-        corporateName: corporateName || "",
-        active: active || "",
+        corporateName: corporateName || ""
       });
     } catch (error) {
       console.error("Error ao buscar dados fornecedores", error);
@@ -87,7 +85,7 @@ export default function Supplier() {
           itemsPerPage,
           filter.document,
           filter.corporateName,
-          filter.active
+
         );
       }
     } catch (error) {
@@ -101,7 +99,6 @@ export default function Supplier() {
       10,
       filter.document,
       filter.corporateName,
-      filter.active
     );
   }, []);
 
@@ -162,7 +159,7 @@ export default function Supplier() {
                         aria-label={"Detalhe"}
                         color={"teal"}
                         icon={<MdDehaze />}
-                        mr={1}
+                        mr={2}
                       ></IconButton>
                     </Tooltip>
                     <Tooltip label="Editar">

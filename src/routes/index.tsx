@@ -8,6 +8,10 @@ import Supplier from "../pages/Supplier";
 import CreateSupplier from "../pages/Supplier/CreateSupplier";
 import EditSupplier from "../pages/Supplier/EditSupplier";
 import Category from "../pages/Category";
+import Customer from "../pages/Customer";
+import CreateCustomer from "../pages/Customer/CreateCustomer";
+import EditCustomer from "../pages/Customer/EditCustomer";
+
 
 interface Props {
   children?: ReactNode;
@@ -65,6 +69,30 @@ const RouteApp = () => {
         element={
           <ProtectedRoute>
             <Category />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/customer"
+        element={
+          <ProtectedRoute>
+            <Customer/>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/customer/create"
+        element={
+          <ProtectedRoute>
+            <CreateCustomer />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/costumer/:id"
+        element={
+          <ProtectedRoute>
+            <EditCustomer />
           </ProtectedRoute>
         }
       />

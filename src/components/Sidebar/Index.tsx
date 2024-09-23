@@ -15,7 +15,7 @@ import { useAuth } from "../../hooks/auth";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import Header from "../Header";
 import { useState } from "react";
-import { MdList, MdOutlineContactPage, MdOutlineHome } from "react-icons/md";
+import { MdList, MdOutlineContactPage, MdOutlineHome, MdOutlinePersonAddAlt } from "react-icons/md";
 import { Linkhover } from "./style";
 import { Link } from "react-router-dom";
 
@@ -26,6 +26,7 @@ export default function Sidebar({ children }: any) {
   const [menusRegister] = useState([
     { name: "Fonecedor", link: "/supplier", icon: <MdOutlineContactPage/> },
     { name: "Categoria", link: "/category", icon: <MdList/> },
+    { name: "Cliente", link: "/customer", icon: <MdOutlinePersonAddAlt /> },
   ]);
 
   return (
