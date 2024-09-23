@@ -45,21 +45,37 @@ export default function SignIn() {
 
   const handleSignIn: SubmitHandler<SignInFormData> = useCallback(
     async (values) => {
-      setIsLoading(true)
+      localStorage.removeItem("emailValidate");
+      setIsLoading(true);
       try {
         const resp = await axios.post(
           "http://localhost:8080/auth/login",
           values
         );
-        setToken(resp.data.token);
-        navigate("/");
-        setIsLoading(false)
+        if (resp.data.confirmedAccount) {
+          setToken(resp.data.token);
+          navigate("/");
+          setIsLoading(false);
+        } else {
+          await axios.post(
+            "http://localhost:8080/emailValidation/sendEmailCode",
+            values.login,
+            {
+              headers: {
+                "Content-Type": "text/plain",
+              },
+            }
+          );
+          navigate("/validatecode");
+          localStorage.setItem("emailValidate", resp.data.email);
+          setIsLoading(false);
+        }
       } catch (error) {
-        setIsLoading(false)
+        setIsLoading(false);
         setError("login", {}),
-        setError("password", {
-          message: "Email ou senha incorretos. Por favor, tente novamente."
-        })
+          setError("password", {
+            message: "Email ou senha incorretos. Por favor, tente novamente.",
+          });
       }
     },
     []

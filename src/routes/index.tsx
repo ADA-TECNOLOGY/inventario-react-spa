@@ -11,6 +11,7 @@ import Category from "../pages/Category";
 import Customer from "../pages/Customer";
 import CreateCustomer from "../pages/Customer/CreateCustomer";
 import EditCustomer from "../pages/Customer/EditCustomer";
+import ValidateCode from "../pages/auth/ValidateCode";
 
 
 interface Props {
@@ -31,6 +32,7 @@ const RouteApp = () => {
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/forgotpassword" element={<ForgotPassword />} />
+      <Route path="/validatecode" element={<ValidateCode />} />
 
       <Route
         path="/"
