@@ -3,7 +3,6 @@ import {
   Button,
   Flex,
   Heading,
-  IconButton,
   Spacer,
   Switch,
   Table,
@@ -27,6 +26,8 @@ import api from "../../services/api";
 import { formatPhone } from "../../util/formatPhone";
 import { formatDocument } from "../../util/formatDocument";
 import FilterCostumer from "./components/FilterCustomer";
+import { IconButton } from '@chakra-ui/react';
+import Swal from "sweetalert2";
 
 interface FildsFilter {
   name: string;
@@ -94,6 +95,35 @@ export default function Customer() {
     }
   };
 
+  // Funcao para deletar categoria
+  const deleteCustomer = async (id: number) => {
+    await api.delete(`/category/${id}`);
+    handleDataCustomer(0, itemsPerPage);
+    Swal.fire({
+      text: "Deletado com sucesso.",
+      icon: "success",
+      confirmButtonColor: "#00838F",
+      timer: 3000,
+    });
+  };
+
+  // Responsavel por chamar dialog, de acordo com o escolhido ele traz a funcao de excluir la de cima
+  const handleDelete = (id: number) => {
+    Swal.fire({
+      text: "Deseja realmente deletar essa categoria?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#00838F",
+      cancelButtonColor: "#748492",
+      confirmButtonText: "Sim",
+      cancelButtonText: "Não",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteCustomer(id);
+      }
+    });
+  };
+
   useEffect(() => {
     handleDataCustomer(0, 10, filter.document, filter.name);
   }, []);
@@ -133,7 +163,7 @@ export default function Customer() {
                   <Td>{e.name}</Td>
                   <Td>{formatDocument(e.document)}</Td>
                   <Td>{formatPhone(e.phone)}</Td>
-                  <Td
+                  <Td mr={3} 
                   >
                     <Tooltip label={e.active ? "Inativar" : "Ativar"} >
                       <Switch
@@ -153,6 +183,17 @@ export default function Customer() {
                         color={"teal"}
                         icon={<MdCreate />}
                       ></IconButton>
+                    </Tooltip>
+                    <Tooltip>
+                      <IconButton 
+                        mr={2}
+                        onClick={() => handleDelete(e.id)}
+                        icon={<MdDelete />}
+                        aria-label={"Excluir"}
+                        bg={"white"}
+                        color={"teal"}
+                        >
+                      </IconButton>
                     </Tooltip>
                   </Td>
                 </Tr>
