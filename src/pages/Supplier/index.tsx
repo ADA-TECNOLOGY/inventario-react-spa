@@ -50,7 +50,7 @@ export default function Supplier() {
   ) => {
     try {
       const resp = await api.get(
-        `/supplier/page?page=${page}&size=${size}&document=${
+        `/supplier?page=${page}&size=${size}&document=${
           document || ""
         }&corporateName=${corporateName || ""}`
       );
