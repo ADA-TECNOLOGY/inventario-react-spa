@@ -54,6 +54,7 @@ export default function SignIn() {
         );
         if (resp.data.confirmedAccount) {
           setToken(resp.data.token);
+          localStorage.setItem("expiresIn", resp.data.expiresIn )
           navigate("/");
           setIsLoading(false);
         } else {

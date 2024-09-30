@@ -55,7 +55,7 @@ export default function Category() {
   // Funcao para trazer a listagem dos dados
   const handleListCategory = async (page: number, size: number) => {
     try {
-      const resp = await api.get(`/category/page?page=${page}&size=${size}`);
+      const resp = await api.get(`/category?page=${page}&size=${size}`);
       setPagination(resp.data);
       setListCategory(resp.data.content);
       setItemsPerPage(size);

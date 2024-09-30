@@ -12,25 +12,67 @@ import Customer from "../pages/Customer";
 import CreateCustomer from "../pages/Customer/CreateCustomer";
 import EditCustomer from "../pages/Customer/EditCustomer";
 import ValidateCode from "../pages/auth/ValidateCode";
-
-
+import { jwtDecode } from "jwt-decode";
+import Products from "../pages/Product";
+import CreateProduct from "../pages/Product/CreateProduct";
 interface Props {
   children?: ReactNode;
 }
 
+interface TokenPayload {
+  exp: number;
+}
+
 const ProtectedRoute = ({ children }: Props) => {
-  const isAuth = localStorage.getItem("token") !== null;
-  if (!isAuth) {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
     return <Navigate to="/signin" replace />;
   }
+
+  try {
+    const decodedToken = jwtDecode<TokenPayload>(token);
+    if (decodedToken.exp * 1000 < Date.now()) {
+      localStorage.removeItem("token");
+      return <Navigate to="/signin" replace />;
+    }
+  } catch (error) {
+    localStorage.removeItem("token");
+    return <Navigate to="/signin" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const RedirectIfAuthenticated = ({ children }: Props) => {
+  const isAuth = localStorage.getItem("token") !== null;
+
+  if (isAuth) {
+    return <Navigate to="/" replace />;
+  }
+
   return <>{children}</>;
 };
 
 const RouteApp = () => {
   return (
     <Routes>
-      <Route path="/signin" element={<SignIn />} />
-      <Route path="/signup" element={<SignUp />} />
+      <Route
+        path="/signin"
+        element={
+          <RedirectIfAuthenticated>
+            <SignIn />
+          </RedirectIfAuthenticated>
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          <RedirectIfAuthenticated>
+            <SignUp />
+          </RedirectIfAuthenticated>
+        }
+      />
       <Route path="/forgotpassword" element={<ForgotPassword />} />
       <Route path="/validatecode" element={<ValidateCode />} />
 
@@ -66,7 +108,7 @@ const RouteApp = () => {
           </ProtectedRoute>
         }
       />
-       <Route
+      <Route
         path="/category"
         element={
           <ProtectedRoute>
@@ -78,7 +120,7 @@ const RouteApp = () => {
         path="/customer"
         element={
           <ProtectedRoute>
-            <Customer/>
+            <Customer />
           </ProtectedRoute>
         }
       />
@@ -91,10 +133,28 @@ const RouteApp = () => {
         }
       />
       <Route
-        path="/costumer/:id"
+        path="/customer/:id"
         element={
           <ProtectedRoute>
             <EditCustomer />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/products"
+        element={
+          <ProtectedRoute>
+            <Products />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/products/create"
+        element={
+          <ProtectedRoute>
+            <CreateProduct />
           </ProtectedRoute>
         }
       />
