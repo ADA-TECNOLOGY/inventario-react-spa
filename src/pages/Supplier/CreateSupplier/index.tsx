@@ -56,7 +56,6 @@ export default function CreateSupplier() {
         };
         await api.post("/supplier", formData);
         Swal.fire({
-          position: "top-end",
           icon: "success",
           title: "Fornecedor salvo com sucesso!",
           showConfirmButton: false,

@@ -20,7 +20,7 @@ import { Controller, useForm } from "react-hook-form";
 import { MdFilterList } from "react-icons/md";
 import { FilterSupplierFormData, filterSupplierFormSchema } from "./formSchema";
 import MaskedInput from "react-text-mask";
-import { cpfMask } from "../../../util/masksInput";
+import { cnpjMask, cpfMask } from "../../../util/masksInput";
 
 export default function FilterSupplier({ handleFilter }: any) {
   const { register, control, getValues, reset } =
@@ -71,7 +71,10 @@ export default function FilterSupplier({ handleFilter }: any) {
                   render={({ field }) => (
                     <Input
                       as={MaskedInput}
-                      mask={cpfMask}
+                      mask={field.value?.replace(/\D/g, "").length > 11
+                        ? cnpjMask
+                        : cpfMask
+                      }
                       id="document"
                       {...register("document")}
                       {...field}

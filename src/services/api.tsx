@@ -22,6 +22,7 @@ export const setupInterceptors = (removeToken: any) => {
       return response;
     },
     (error) => {
+      console.log(error)
       if (error.response && (error.response.status === 403 || error.response.status === 401)) {
         removeToken();
       }

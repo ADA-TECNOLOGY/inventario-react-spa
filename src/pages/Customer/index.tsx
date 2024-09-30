@@ -52,8 +52,7 @@ export default function Customer() {
   ) => {
     try {
       const resp = await api.get(
-        `/customer?page=${page}&size=${size}&document=${document || ""}&name=${
-          name || ""} `
+        `/customer?page=${page}&size=${size}`
       );
       setItemsPerPage(size || 10); // quantidade de item por página
       setCustomer(resp.data.content);
@@ -75,11 +74,9 @@ export default function Customer() {
       if (resp.status == 200) {
         toast({
           description: `${
-            resp.data.active
-              ? "Cliente ativado com sucesso!"
-              : "Cliente desativado com sucesso!"
+            resp.data
           }`,
-          status: "success",
+          status: resp.data === "Cliente Desabilitado com sucesso!" ? "warning" : "success",
           duration: 3000,
           isClosable: true,
         });
@@ -123,25 +120,22 @@ export default function Customer() {
           <Table>
             <Thead>
               <Tr>
-                <Th textAlign="center">Nome</Th>
-                <Th textAlign="center">CNPJ/CPF</Th>
-                <Th textAlign="center">Fone</Th>
-                <Th textAlign="center">E-mail</Th>
-                <Th textAlign="center">Ativar / Inativar</Th>
-                <Th textAlign="center"> Ações</Th>
+                <Th>Nome</Th>
+                <Th>CNPJ/CPF</Th>
+                <Th>Fone</Th>
+                <Th>Ativar / Inativar</Th>
+                <Th>Ações</Th>
               </Tr>
             </Thead>
             <Tbody>
               {customer?.map((e: CustomerModel) => (
                 <Tr key={e?.id} _hover={{ bg: "gray.100" }}>
                   <Td>{e.name}</Td>
-                  <Td textAlign="center">{formatDocument(e.document)}</Td>
-                  <Td textAlign="center">{formatPhone(e.phone)}</Td>
-                  <Td textAlign="center">{e.email}</Td>
+                  <Td>{formatDocument(e.document)}</Td>
+                  <Td>{formatPhone(e.phone)}</Td>
                   <Td
-                    textAlign="center"
                   >
-                    <Tooltip label={e.active ? "Inativar" : "Ativar"}>
+                    <Tooltip label={e.active ? "Inativar" : "Ativar"} >
                       <Switch
                         onChange={() => enableDisableCustomer(e.id)}
                         isChecked={e.active}
@@ -153,7 +147,7 @@ export default function Customer() {
                     <Tooltip label="Editar">
                       <IconButton
                         mr={2}
-                        onClick={() => navigate(`/costumer/${e.id}`)}
+                        onClick={() => navigate(`/customer/${e.id}`)}
                         bg={"white"}
                         aria-label={"Editar"}
                         color={"teal"}

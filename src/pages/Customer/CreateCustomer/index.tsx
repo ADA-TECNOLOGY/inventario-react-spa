@@ -62,7 +62,6 @@ export default function CreateCustomer() {
             }
             await api.post("/customer", formData)
             Swal.fire({
-                position: "top-end",
                 icon: "success",
                 title: "Cliente salvo com sucesso!",
                 showConfirmButton: false,

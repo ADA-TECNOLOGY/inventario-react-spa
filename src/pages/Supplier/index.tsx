@@ -124,10 +124,10 @@ export default function Supplier() {
           <Table>
             <Thead>
               <Tr>
-                <Th textAlign="left">Nome</Th>
-                <Th textAlign="center">CNPJ/CPF</Th>
-                <Th textAlign="center">Fone</Th>
-                <Th textAlign="center">Ativar / Inativar</Th>
+                <Th>Nome</Th>
+                <Th>CNPJ/CPF</Th>
+                <Th>Fone</Th>
+                <Th>Ativar / Inativar</Th>
                 <Th textAlign="right" display="flex" ml={9}>
                   Ações
                 </Th>
