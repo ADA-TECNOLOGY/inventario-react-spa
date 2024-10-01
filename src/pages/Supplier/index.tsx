@@ -124,13 +124,11 @@ export default function Supplier() {
           <Table>
             <Thead>
               <Tr>
-                <Th textAlign="left">Nome</Th>
-                <Th textAlign="center">CNPJ/CPF</Th>
-                <Th textAlign="center">Fone</Th>
-                <Th textAlign="center">Ativar / Inativar</Th>
-                <Th textAlign="right" display="flex" ml={9}>
-                  Ações
-                </Th>
+                <Th>Nome</Th>
+                <Th>CNPJ/CPF</Th>
+                <Th>Fone</Th>
+                <Th>Ativar / Inativar</Th>
+                <Th>Ações</Th>
               </Tr>
             </Thead>
             <Tbody>
@@ -139,20 +137,16 @@ export default function Supplier() {
                   <Td>{e.corporateName}</Td>
                   <Td>{formatDocument(e.document)}</Td>
                   <Td>{formatPhone(e.phone)}</Td>
-                  <Tooltip label={e.active ? "Inativar" : "Ativar"}>
-                    <Td
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="center"
-                    >
+                  <Td mr={3}>
+                  <Tooltip label={e.active ? "Inativar" : "Ativar"}>  
                       <Switch
                         onChange={() => enableDisableSupplier(e.id)}
                         isChecked={e.active}
                         colorScheme="teal"
                       />
-                    </Td>
                   </Tooltip>
-                  <Td textAlign="right">
+                  </Td>
+                  <Td>
                     <Tooltip label="Detalhe">
                       <IconButton
                         bg={"white"}
