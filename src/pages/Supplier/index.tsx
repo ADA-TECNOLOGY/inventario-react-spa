@@ -128,9 +128,7 @@ export default function Supplier() {
                 <Th>CNPJ/CPF</Th>
                 <Th>Fone</Th>
                 <Th>Ativar / Inativar</Th>
-                <Th textAlign="right" display="flex" ml={9}>
-                  Ações
-                </Th>
+                <Th>Ações</Th>
               </Tr>
             </Thead>
             <Tbody>
@@ -139,20 +137,16 @@ export default function Supplier() {
                   <Td>{e.corporateName}</Td>
                   <Td>{formatDocument(e.document)}</Td>
                   <Td>{formatPhone(e.phone)}</Td>
-                  <Tooltip label={e.active ? "Inativar" : "Ativar"}>
-                    <Td
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="center"
-                    >
+                  <Td mr={3}>
+                  <Tooltip label={e.active ? "Inativar" : "Ativar"}>  
                       <Switch
                         onChange={() => enableDisableSupplier(e.id)}
                         isChecked={e.active}
                         colorScheme="teal"
                       />
-                    </Td>
                   </Tooltip>
-                  <Td textAlign="right">
+                  </Td>
+                  <Td>
                     <Tooltip label="Detalhe">
                       <IconButton
                         bg={"white"}
