@@ -183,10 +183,10 @@ export default function EditSupplier() {
         <CardBody textAlign={"center"}>
           <Box as="form" onSubmit={handleSubmit(handleUpdateSupplier)} mt="5">
             <SimpleGrid
-              mt={3} // espaçamento entre input de cima e o debaixo
-              columns={2} // quantidade de colunas
-              spacing={5} // espacamento entre um input e outro
-              templateColumns="5fr 5fr"
+              mt={3}
+              columns={[1, 2]}
+              spacing={5} 
+              templateColumns={["1fr", "5fr 5fr"]}
             >
               <FormControl isInvalid={!!errors.corporateName}>
                 <FormLabel>Razão social</FormLabel>
@@ -210,9 +210,9 @@ export default function EditSupplier() {
             <SimpleGrid
               alignItems={"center"}
               mt={3}
-              columns={2}
+              columns={[1, 2]}
               spacing={5}
-              templateColumns="1fr 5fr"
+              templateColumns={["1fr", "1fr 5fr"]}
             >
               <RadioGroup
                 mt={6}
@@ -247,9 +247,9 @@ export default function EditSupplier() {
             </SimpleGrid>
             <SimpleGrid
               mt={3}
-              columns={2}
+              columns={[1, 2]}
               spacing={2}
-              templateColumns="1fr 3fr"
+              templateColumns={["1fr", "1fr 3fr"]}
             >
               <FormControl isInvalid={!!errors.phone}>
                 <FormLabel>Fone</FormLabel>
@@ -281,9 +281,9 @@ export default function EditSupplier() {
             </SimpleGrid>
             <SimpleGrid
               mt={3}
-              columns={3}
+              columns={[1, 3]}
               spacing={5}
-              templateColumns="2fr 6fr 1fr"
+              templateColumns={["1fr", "2fr 6fr 1fr"]}
             >
               <FormControl isInvalid={!!errors?.address?.postalCode}>
                 <FormLabel>Cep</FormLabel>
@@ -328,9 +328,9 @@ export default function EditSupplier() {
             </SimpleGrid>
             <SimpleGrid
               mt={3}
-              columns={3}
+              columns={[1, 3]}
               spacing={5}
-              templateColumns="4fr 1fr 4fr"
+              templateColumns={["1fr", "4fr 1fr 4fr"]}
             >
               <FormControl isInvalid={!!errors.address?.district}>
                 <FormLabel>Bairro</FormLabel>

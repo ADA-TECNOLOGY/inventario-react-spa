@@ -39,9 +39,9 @@ export default function FilterCostumer({ handleFilter }: any) {
 
   return (
     <>
-      <Tooltip label="Filtro">
-        <Button ml={2} colorScheme="teal" variant="outline" onClick={onOpen}>
-          Filtros <MdFilterList />
+      <Tooltip label="Filtros">
+        <Button rightIcon={<MdFilterList/>} colorScheme="teal" variant="outline" onClick={onOpen}>
+          Filtros
         </Button>
       </Tooltip>
       <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
