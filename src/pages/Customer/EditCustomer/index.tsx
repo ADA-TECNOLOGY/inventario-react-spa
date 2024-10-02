@@ -187,9 +187,9 @@ import { formatDocument } from "../../../util/formatDocument";
             <Box as="form" onSubmit={handleSubmit(handleUpdateCustomer)} mt={5}>
               <SimpleGrid
                 mt={3}
-                columns={3}
+                columns={[1, 2, 3]}
                 spacing={5}
-                templateColumns={"5fr 5fr"}
+                templateColumns={["1fr", "5fr 5fr", "5fr 5fr 5fr"]}
               >
                 <FormControl isInvalid={!!errors.name}>
                   <FormLabel>Nome</FormLabel>
@@ -223,9 +223,9 @@ import { formatDocument } from "../../../util/formatDocument";
               </SimpleGrid>
               <SimpleGrid
                 mt={3}
-                columns={3}
+                columns={[1, 2, 3]}
                 spacing={5}
-                templateColumns={"6fr 3fr 3fr"}
+                templateColumns={["1fr", "2fr 3fr", "6fr 3fr 3fr"]}
               >
                 <FormControl isInvalid={!!errors.email}>
                   <FormLabel>E-mail</FormLabel>
@@ -269,9 +269,9 @@ import { formatDocument } from "../../../util/formatDocument";
               </SimpleGrid>
               <SimpleGrid
                 mt={3}
-                columns={4}
+                columns={[1, 2, 4]}
                 spacing={5}
-                templateColumns={"3fr 4fr 2fr 3fr"}
+                templateColumns={["1fr", "1fr 1fr", "3fr 4fr 2fr 3fr"]}
               >
                 <FormControl isInvalid={!!errors?.address?.postalCode}>
                   <FormLabel>Cep</FormLabel>
@@ -326,9 +326,9 @@ import { formatDocument } from "../../../util/formatDocument";
               </SimpleGrid>
               <SimpleGrid
                 mt={3}
-                columns={3}
+                columns={[1, 2, 3]}
                 spacing={5}
-                templateColumns={"1fr 4fr 6fr"}
+                templateColumns={["1fr", "1fr 1fr", "1fr 4fr 6fr"]}
               >
                 <FormControl isInvalid={!!errors?.address?.state}>
                   <FormLabel>UF</FormLabel>
@@ -378,11 +378,11 @@ import { formatDocument } from "../../../util/formatDocument";
                 <Button 
                     type="submit" 
                     colorScheme={"teal"} 
-                    width={"15%"} 
                     mt={5}
+                    
                     isLoading={isLoading}
                 >
-                  Salvar Alterações
+                Atualizar
                 </Button>
               </Flex>
             </Box>
