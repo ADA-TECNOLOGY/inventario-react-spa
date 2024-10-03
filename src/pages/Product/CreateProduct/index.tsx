@@ -10,12 +10,14 @@ import {
   Input,
   Select,
   SimpleGrid,
+  Text,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import Autocomplete from "../../../components/Autocomplete";
 import api from "../../../services/api";
 import { useEffect, useState } from "react";
 import { SupplierModel } from "../../../model/Supplier.model";
+import ImageUpload from "../../../components/ImageUpload";
 
 export default function CreateProduct() {
   const [filteredSuggestions, setFilteredSuggestions] = useState<
@@ -38,8 +40,7 @@ export default function CreateProduct() {
     setFilteredSuggestions(suggestions);
   };
 
-  useEffect(() => {
-  }, [filteredSuggestions]);
+  useEffect(() => {}, [filteredSuggestions]);
 
   return (
     <Box mb="2%">
@@ -131,6 +132,12 @@ export default function CreateProduct() {
               <FormControl>
                 <FormLabel>Observação</FormLabel>
                 <Input id="name" />
+              </FormControl>
+            </SimpleGrid>
+            <SimpleGrid mt={3} columns={2} spacing={5} templateColumns="5fr">
+              <FormControl>
+                <FormLabel>Adicione as imagens</FormLabel>
+                <ImageUpload />
               </FormControl>
             </SimpleGrid>
           </Box>
