@@ -91,7 +91,7 @@ export default function Sidebar({ children }: any) {
             <Container
               transition="margin-left 0.3s ease-in-out"
               ml={isOpenSidebar ? { base: 0, md: "340px" } : ""}
-              maxW={isOpenSidebar ? "75%" : "85%"}
+              maxW={isOpenSidebar ? "75%" : "90%"}
               mt={20}
             >
               {children}

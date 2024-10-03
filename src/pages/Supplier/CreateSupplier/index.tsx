@@ -56,7 +56,6 @@ export default function CreateSupplier() {
         };
         await api.post("/supplier", formData);
         Swal.fire({
-          position: "top-end",
           icon: "success",
           title: "Fornecedor salvo com sucesso!",
           showConfirmButton: false,
@@ -181,9 +180,9 @@ export default function CreateSupplier() {
             <SimpleGrid
               alignItems={"center"}
               mt={3}
-              columns={2}
+              columns={3}
               spacing={5}
-              templateColumns="1fr 5fr"
+              templateColumns="1fr 4fr 5fr"
             >
               <RadioGroup
                 mt={6}
