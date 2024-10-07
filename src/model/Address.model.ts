@@ -2,7 +2,7 @@ export class AddressModel {
   id: number;
   street: string;
   city: string;
-  number: number;
+  number: string ;
   complement: string;
   district: string;
   state: string;
@@ -12,7 +12,7 @@ export class AddressModel {
     id: number,
     street: string,
     city: string,
-    number: number,
+    number: string ,
     complement: string,
     district: string,
     state: string,

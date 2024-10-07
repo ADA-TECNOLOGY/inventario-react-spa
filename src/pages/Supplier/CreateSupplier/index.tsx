@@ -6,6 +6,7 @@ import {
   Button,
   Card,
   CardBody,
+  Checkbox,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -31,15 +32,17 @@ import MaskedInput from 'react-text-mask'
 import { cepMask, cnpjMask, cpfMask, phoneNumberMask } from "../../../util/masksInput";
 
 export default function CreateSupplier() {
-  const { register, control, handleSubmit, formState, getValues, setValue } =
+  const [disableNumber, setDisableNumber] = useState<boolean>(false)
+  const { register, control, handleSubmit, formState, getValues, setValue, clearErrors } =
     useForm<CreateSupplierFormData>({
-      resolver: yupResolver(createSupplierFormSchema) as any,
+      resolver: yupResolver(createSupplierFormSchema(disableNumber)) as any,
     });
 
   const [isLoading, setIsLoading] = useState(false);
   const [ufs, setUfs] = useState<StateModel[]>([]);
   const [cities, setCities] = useState<CitiesModel[]>([]);
   const [typeDocument, setTypeDocument] = useState("cnpj");
+
   const { errors } = formState;
   const navigate = useNavigate();
 
@@ -83,11 +86,6 @@ export default function CreateSupplier() {
     }
   };
 
-  useEffect(() => {
-    dataState(); // Chama a função para buscar os estados
-    setValue("address.city", getValues().address.city);
-  }, [cities]);
-
   //busca uma lista de cidades usando a API do IBGE(conforme a uf selecionada)
   const handleCity = async () => {
     const state = getValues().address.state; //obtem o valor da UF selecionada no campo
@@ -124,6 +122,7 @@ export default function CreateSupplier() {
         setValue("address.street", street);
         handleCity();
         setValue("address.city", city);
+        clearErrors("address")
       } catch (error) {
         console.log("Error ao buscar cep", error);
       }
@@ -136,6 +135,20 @@ export default function CreateSupplier() {
     setTypeDocument(value);
     setValue("document", "")
   };
+
+  const handleNoNumber = (e:any) => {
+    const checkbox = e.target.checked;
+     setDisableNumber(checkbox)
+     if(checkbox) {
+      setValue("address.number", "")
+      clearErrors("address.number")
+     }
+  }
+  
+  useEffect(() => {
+    dataState();
+    setValue("address.city", getValues().address.city);
+  }, [cities, disableNumber]);
 
   return (
     <Box mb="2%">
@@ -154,9 +167,9 @@ export default function CreateSupplier() {
           <Box as="form" onSubmit={handleSubmit(handleCreateSupplier)} mt="5">
             <SimpleGrid
               mt={3} // espacamento entre input de cima e o debaixo
-              columns={2} // quantidade de colunas
+              columns={{ base: 1, md: 2 }} // quantidade de colunas
               spacing={5} // espacamento entre um input e outro
-              templateColumns="5fr 5fr"
+              templateColumns={{ base: "1fr", md: "5fr 5fr" }}
             >
               <FormControl isInvalid={!!errors.corporateName}>
                 <FormLabel>Razão social</FormLabel>
@@ -180,9 +193,9 @@ export default function CreateSupplier() {
             <SimpleGrid
               alignItems={"center"}
               mt={3}
-              columns={3}
+              columns={{ base: 1, md: 2 }}
               spacing={5}
-              templateColumns="1fr 4fr 5fr"
+              templateColumns={{ base: "1fr", md: "1fr 6fr" }}
             >
               <RadioGroup
                 mt={6}
@@ -217,9 +230,9 @@ export default function CreateSupplier() {
             </SimpleGrid>
             <SimpleGrid
               mt={3}
-              columns={2}
+              columns={{ base: 1, md: 2 }}
               spacing={2}
-              templateColumns="1fr 3fr"
+              templateColumns={{ base: "1fr", md: "1fr 3fr" }}
             >
               <FormControl isInvalid={!!errors.phone}>
                 <FormLabel>Fone</FormLabel>
@@ -251,9 +264,9 @@ export default function CreateSupplier() {
             </SimpleGrid>
             <SimpleGrid
               mt={3}
-              columns={3}
+              columns={{ base: 1, sm: 2, md: 4 }}
               spacing={5}
-              templateColumns="2fr 6fr 1fr"
+              templateColumns={{ base: "1fr", sm: "1fr 1fr", md: "2fr 4fr 1fr 1fr" }}
             >
               <FormControl isInvalid={!!errors?.address?.postalCode}>
                 <FormLabel>Cep</FormLabel>
@@ -286,9 +299,12 @@ export default function CreateSupplier() {
                   </FormErrorMessage>
                 )}
               </FormControl>
+              <FormControl mt={9}>
+                <Checkbox size='lg' onChange={handleNoNumber} colorScheme="teal">S/N</Checkbox>
+              </FormControl>
               <FormControl isInvalid={!!errors?.address?.number}>
                 <FormLabel>Número</FormLabel>
-                <Input id="address.number" {...register("address.number")} />
+                <Input isDisabled={disableNumber} id="address.number" {...register("address.number")} />
                 {errors.address?.number && (
                   <FormErrorMessage>
                     {errors.address?.number.message}
@@ -298,9 +314,9 @@ export default function CreateSupplier() {
             </SimpleGrid>
             <SimpleGrid
               mt={3}
-              columns={3}
+              columns={{ base: 1, sm: 2, md: 3 }}
               spacing={5}
-              templateColumns="4fr 1fr 4fr"
+              templateColumns={{ base: "1fr", sm: "2fr 1fr", md: "4fr 1fr 4fr" }}
             >
               <FormControl isInvalid={!!errors.address?.district}>
                 <FormLabel>Bairro</FormLabel>
@@ -361,7 +377,7 @@ export default function CreateSupplier() {
               <Button
                 type="submit"
                 colorScheme={"teal"}
-                width={"15%"}
+                width={{ base: "80%", md: "15%" }}
                 mt={5}
                 isLoading={isLoading}
               >

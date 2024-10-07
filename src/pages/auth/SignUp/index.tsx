@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   CardBody,
+  Checkbox,
   Container,
   Flex,
   FormControl,
@@ -35,9 +36,10 @@ import {
 import MaskedInput from "react-text-mask";
 
 export default function SignUp() {
-  const { register, control, handleSubmit, getValues, formState, setValue } =
+  const [disableNumber, setDisableNumber] = useState<boolean>(false)
+  const { register, control, handleSubmit, getValues, formState, setValue, clearErrors } =
     useForm<SignUpFormData>({
-      resolver: yupResolver(signUpFormSchema) as any,
+      resolver: yupResolver(signUpFormSchema(disableNumber)) as any,
     });
   const [isLoading, setIsLoading] = useState(false);
   const [uf, setUf] = useState<StateModel[]>([]);
@@ -102,12 +104,6 @@ export default function SignUp() {
     }
   };
 
-  useEffect(() => {
-    dataUf();
-    //TODO: Melhorar isso
-    setValue("city", getValues().city);
-  }, [cities]);
-
   //Funcao para trazer as cidades ao clicar na UF
   const handleCity = async () => {
     const state = getValues().state;
@@ -152,6 +148,21 @@ export default function SignUp() {
     setTypeDocument(value);
     setValue("document", "");
   };
+
+  const handleNoNumber = (e:any) => {
+    const checkbox = e.target.checked;
+     setDisableNumber(checkbox)
+     if(checkbox) {
+      setValue("number", "")
+      clearErrors("number")
+     }
+  }
+
+  useEffect(() => {
+    dataUf();
+    //TODO: Melhorar isso
+    setValue("city", getValues().city);
+  }, [cities,disableNumber]);
 
   return (
     <Container
@@ -301,9 +312,12 @@ export default function SignUp() {
                     <FormErrorMessage>{errors.street.message}</FormErrorMessage>
                   )}
                 </FormControl>
+                <FormControl mt={9}>
+                <Checkbox size='lg' onChange={handleNoNumber} colorScheme="teal">S/N</Checkbox>
+              </FormControl>
                 <FormControl isInvalid={!!errors.number}>
                   <FormLabel>Número</FormLabel>
-                  <Input id="number" {...register("number")} />
+                  <Input isDisabled={disableNumber} id="number" {...register("number")} />
                   {errors.number && (
                     <FormErrorMessage>{errors.number.message}</FormErrorMessage>
                   )}

@@ -6,6 +6,7 @@ import {
     Button,
     Card,
     CardBody,
+    Checkbox,
     Flex,
     FormControl,
     FormErrorMessage,
@@ -30,16 +31,19 @@ import {
   import api from "../../../services/api";
   import Swal from "sweetalert2";
   import axios from "axios";
-import { EditCustomerFormData, editCustomerFormData, editCustomerFormSchema } from "./formSchema";
+import { EditCustomerFormData, editCustomerFormSchema } from "./formSchema";
 import { CustomerModel } from "../../../model/Customer.model";
 import { formatPhone } from '../../../util/formatPhone';
 import { formatPostalCode } from "../../../util/formatPostalCode";
 import { formatDocument } from "../../../util/formatDocument";
+import Supplier from "../../Supplier";
   
   export default function EditCustomer() {
-    const { register, control, handleSubmit, formState, getValues, setValue } =
-      useForm<editCustomerFormData>({
-        resolver: yupResolver(editCustomerFormSchema) as any,
+    const [disableNumber, setDisableNumber] = useState<boolean>(false);
+
+    const { register, control, handleSubmit, formState, getValues, setValue, resetField, clearErrors } =
+      useForm<EditCustomerFormData>({
+        resolver: yupResolver(editCustomerFormSchema(disableNumber)) as any,
       });
   
     const [isLoading, setIsLoading] = useState(false);
@@ -70,6 +74,9 @@ import { formatDocument } from "../../../util/formatDocument";
         setValue("birthDate", customer.birthDate);
         setValue("address", customer.address);
         setValue("address.postalCode", formatPostalCode(customer.address.postalCode));
+        if (customer.address.number == null) {
+          setDisableNumber(true)
+        }
     }
 
     //funcao para salvar os novos dados editados
@@ -113,15 +120,6 @@ import { formatDocument } from "../../../util/formatDocument";
         console.error("Error ao buscar UF", error); // Captura e exibe um erro no console, caso ocorra
       }
     };
-  
-    useEffect(() => {
-      dataState(); // Chama a função para buscar os estados
-      getByCustomer(); // chama a funcao de trazer os dados da tela
-      setValue("address.city", getValues().address.city);
-      if (controlState) {
-      handleCity();
-    }
-  }, [controlState]);
   
     //busca uma lista de cidades usando a API do IBGE(conforme a uf selecionada)
     const handleCity = async () => {
@@ -169,6 +167,26 @@ import { formatDocument } from "../../../util/formatDocument";
     const handleTypeDocumentChange = (value: any) => {
         setTypeDocument(value);
       };
+
+      const handleNoNumber = (e: any) => {
+        const checkbox = e.target.checked;
+        setDisableNumber(checkbox);
+        if (checkbox) {
+          resetField("address.number");
+          setValue("address.number", "");
+          clearErrors("address.number");
+        }
+      };
+
+      useEffect(() => {
+        dataState(); // Chama a função para buscar os estados
+        getByCustomer(); // chama a funcao de trazer os dados da tela
+        setValue("address.city", getValues().address.city);
+        if (controlState) {
+        handleCity();
+      }
+    }, [controlState]);
+    
   
     return (
       <Box mb="2%">
@@ -304,9 +322,19 @@ import { formatDocument } from "../../../util/formatDocument";
                     </FormErrorMessage>
                   )}
                 </FormControl>
+                <FormControl mt={9}>
+                <Checkbox
+                  size="lg"
+                  onChange={handleNoNumber}
+                  colorScheme="teal"
+                  isChecked={disableNumber}
+                >
+                  S/N
+                </Checkbox>
+              </FormControl>
                 <FormControl isInvalid={!!errors?.address?.number}>
                   <FormLabel>Número</FormLabel>
-                  <Input id="address.number" {...register("address.number")} />
+                  <Input isDisabled={disableNumber} id="address.number" {...register("address.number")} />
                   {errors?.address?.number && (
                     <FormErrorMessage>
                       {errors?.address?.number.message}

@@ -6,6 +6,7 @@ import {
   Button,
   Card,
   CardBody,
+  Checkbox,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -28,17 +29,32 @@ import axios from "axios";
 import { StateModel } from "../../../model/State.model";
 import { CitiesModel } from "../../../model/Cities.model";
 import MaskedInput from "react-text-mask";
-import { cepMask, cnpjMask, cpfMask, phoneNumberMask } from "../../../util/masksInput";
+import {
+  cepMask,
+  cnpjMask,
+  cpfMask,
+  phoneNumberMask,
+} from "../../../util/masksInput";
 import { SupplierModel } from "../../../model/Supplier.model";
 import { formatPostalCode } from "../../../util/formatPostalCode";
 import { formatPhone } from "../../../util/formatPhone";
 import { formatDocument } from "../../../util/formatDocument";
 
 export default function EditSupplier() {
-  const { register, control, handleSubmit, formState, getValues, setValue } =
-    useForm<EditSupplierFormData>({
-      resolver: yupResolver(editSupplierFormSchema) as any,
-    });
+  const [disableNumber, setDisableNumber] = useState<boolean>(false);
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState,
+    getValues,
+    setValue,
+    clearErrors,
+    resetField,
+    
+  } = useForm<EditSupplierFormData>({
+    resolver: yupResolver(editSupplierFormSchema(disableNumber)) as any,
+  });
 
   const [isLoading, setIsLoading] = useState(false);
   const [ufs, setUfs] = useState<StateModel[]>([]);
@@ -48,26 +64,33 @@ export default function EditSupplier() {
   const navigate = useNavigate();
   const { id } = useParams(); // obtem o id que esta na rota
   const controlState = useWatch({ control, name: "address.state" });
+
   // Função para trazer os dados da tela
   const getBySupplier = async () => {
     try {
       const resp = await api.get(`/supplier/${id}`);
       const supplier = resp.data;
-      prepareFields(supplier)
+      prepareFields(supplier);
     } catch (error) {
       console.error("Erro ao buscar dados", error);
     }
   };
 
-  const prepareFields = (supplier : SupplierModel) => {
+  const prepareFields = (supplier: SupplierModel) => {
     setValue("corporateName", supplier.corporateName);
     setValue("tradeName", supplier.tradeName);
-    setValue("document",  formatDocument(supplier.document));
+    setValue("document", formatDocument(supplier.document));
     setValue("phone", formatPhone(supplier.phone));
     setValue("email", supplier.email);
     setValue("address", supplier.address);
-    setValue("address.postalCode", formatPostalCode(supplier.address.postalCode))
-  }
+    setValue(
+      "address.postalCode",
+      formatPostalCode(supplier.address.postalCode)
+    );
+    if (supplier.address.number == null) {
+      setDisableNumber(true) 
+    }
+  };
 
   //Salva o dados do fornecedor
   const handleUpdateSupplier: SubmitHandler<EditSupplierFormData> = useCallback(
@@ -111,15 +134,6 @@ export default function EditSupplier() {
     }
   };
 
-  useEffect(() => {
-    dataState(); // Chama a função para buscar os estados
-    getBySupplier(); // chama a funcao de trazer os dados da tela
-    setValue("address.city", getValues().address.city);
-    if (controlState) {
-      handleCity();
-    }
-  }, [controlState]);
-
   //busca uma lista de cidades usando a API do IBGE(conforme a uf selecionada)
   const handleCity = async () => {
     const state = getValues().address.state; //obtem o valor da UF selecionada no campo
@@ -156,6 +170,7 @@ export default function EditSupplier() {
         setValue("address.street", street);
         handleCity();
         setValue("address.city", city);
+        clearErrors("address");
       } catch (error) {
         console.log("Error ao buscar cep", error);
       }
@@ -166,6 +181,26 @@ export default function EditSupplier() {
   const handleTypeDocumentChange = (value: any) => {
     setTypeDocument(value);
   };
+
+  const handleNoNumber = (e: any) => {
+    const checkbox = e.target.checked;
+    setDisableNumber(checkbox);
+    if (checkbox) {
+      resetField("address.number");
+      setValue("address.number", "");
+      clearErrors("address.number");
+    }
+  };
+
+  useEffect(() => {
+    dataState(); // Chama a função para buscar os estados
+    getBySupplier(); // chama a funcao de trazer os dados da tela
+    setValue("address.city", getValues().address.city);
+
+    if (controlState) {
+      handleCity();
+    }
+  }, [controlState]);
 
   return (
     <Box mb="2%">
@@ -185,7 +220,7 @@ export default function EditSupplier() {
             <SimpleGrid
               mt={3}
               columns={[1, 2]}
-              spacing={5} 
+              spacing={5}
               templateColumns={["1fr", "5fr 5fr"]}
             >
               <FormControl isInvalid={!!errors.corporateName}>
@@ -281,9 +316,9 @@ export default function EditSupplier() {
             </SimpleGrid>
             <SimpleGrid
               mt={3}
-              columns={[1, 3]}
+              columns={[1, 2, 4]}
               spacing={5}
-              templateColumns={["1fr", "2fr 6fr 1fr"]}
+              templateColumns={["1fr", "1fr 3fr", "2fr 4fr 1fr 1fr"]}
             >
               <FormControl isInvalid={!!errors?.address?.postalCode}>
                 <FormLabel>Cep</FormLabel>
@@ -316,9 +351,23 @@ export default function EditSupplier() {
                   </FormErrorMessage>
                 )}
               </FormControl>
+              <FormControl mt={9}>
+                <Checkbox
+                  size="lg"
+                  onChange={handleNoNumber}
+                  colorScheme="teal"
+                  isChecked={disableNumber}
+                >
+                  S/N
+                </Checkbox>
+              </FormControl>
               <FormControl isInvalid={!!errors?.address?.number}>
                 <FormLabel>Número</FormLabel>
-                <Input id="address.number" {...register("address.number")} />
+                <Input
+                  isDisabled={disableNumber}
+                  id="address.number"
+                  {...register("address.number")}
+                />
                 {errors.address?.number && (
                   <FormErrorMessage>
                     {errors.address?.number.message}
