@@ -6,6 +6,7 @@ import {
   Button,
   Card,
   CardBody,
+  Checkbox,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -37,9 +38,11 @@ import Swal from "sweetalert2";
 import axios from "axios";
 
 export default function CreateCustomer() {
-  const { register, control, handleSubmit, formState, getValues, setValue } =
+  const [disableNumber, setDisableNumber] = useState<boolean>(false)
+
+  const { register, control, handleSubmit, formState, getValues, setValue, resetField, clearErrors } =
     useForm<CreateCustomerFormData>({
-      resolver: yupResolver(createCustomerFormSchema) as any,
+      resolver: yupResolver(createCustomerFormSchema(disableNumber)) as any,
     });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -87,11 +90,6 @@ export default function CreateCustomer() {
       console.error("Error ao buscar UF", error); // Captura e exibe um erro no console, caso ocorra
     }
   };
-
-  useEffect(() => {
-    dataState(); // Chama a função para buscar os estados
-    setValue("address.city", getValues().address.city);
-  }, [cities]);
 
   //busca uma lista de cidades usando a API do IBGE(conforme a uf selecionada)
   const handleCity = async () => {
@@ -141,6 +139,21 @@ export default function CreateCustomer() {
     setTypeDocument(value);
     setValue("document", "")
   };
+
+  const handleNoNumber = (e: any) => {
+    const checkbox = e.target.checked
+    setDisableNumber(checkbox)
+    if (checkbox) {
+      resetField("address.number")
+      setValue("address.number", "")
+      clearErrors("address.number")
+    }
+  }
+  
+  useEffect(() => {
+    dataState(); // Chama a função para buscar os estados
+    setValue("address.city", getValues().address.city);
+  }, [cities, disableNumber]);
 
   return (
     <Box mb="2%">
@@ -286,9 +299,12 @@ export default function CreateCustomer() {
                   </FormErrorMessage>
                 )}
               </FormControl>
+              <FormControl mt={9}>
+                <Checkbox size='lg' onChange={handleNoNumber} colorScheme="teal">S/N</Checkbox>
+              </FormControl>
               <FormControl isInvalid={!!errors?.address?.number}>
                 <FormLabel>Número</FormLabel>
-                <Input id="address.number" {...register("address.number")} />
+                <Input  isDisabled={disableNumber} id="address.number" {...register("address.number")} />
                 {errors?.address?.number && (
                   <FormErrorMessage>
                     {errors?.address?.number.message}
