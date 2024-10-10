@@ -5,9 +5,11 @@ import { useEffect, useRef, useState } from "react";
 interface Props {
     handleFilter: any
     suggestions: Array<any>
+    handleGetSupplier: any
+
 }
 
-export default function Autocomplete({ handleFilter, suggestions } : Props) {
+export default function Autocomplete({ handleFilter, suggestions, handleGetSupplier } : Props) {
   const [query, setQuery] = useState<any>();
   const [filteredSuggestions, setFilteredSuggestions] = useState<Array<any>>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -33,12 +35,13 @@ export default function Autocomplete({ handleFilter, suggestions } : Props) {
   const handleClick = (suggestion: any) => {
     setQuery(suggestion);
     setShowSuggestions(false);
+    handleGetSupplier(suggestion)
   };
 
   useEffect(() => {
     function handleClickOutside(event: any) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        if(query.id == undefined){
+        if(query && query.id == undefined){
           setQuery("")
         }
         setShowSuggestions(false);

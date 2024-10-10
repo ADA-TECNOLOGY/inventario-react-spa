@@ -1,11 +1,11 @@
 import {
+  Badge,
   Box,
   Button,
   Flex,
   Heading,
   IconButton,
   Spacer,
-  Switch,
   Table,
   TableContainer,
   Tbody,
@@ -14,7 +14,6 @@ import {
   Thead,
   Tooltip,
   Tr,
-  useToast,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { MdCreate, MdDehaze } from "react-icons/md";
@@ -22,10 +21,6 @@ import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { Page } from "../../model/interface/pagination.interface";
 import Pagination from "../../components/PaginationGroupItems";
-import { formatDocument } from "../../util/formatDocument";
-import { formatPhone } from "../../util/formatPhone";
-import { SupplierModel } from "../../model/Supplier.model";
-import { formatTime } from "../../util/formatTime";
 import { formatDate } from "../../util/formatDate";
 
 interface FildsFilter {
@@ -35,7 +30,6 @@ interface FildsFilter {
 
 export default function Products() {
   const navigate = useNavigate();
-  const toast = useToast();
 
   const [products, setProducts] = useState<any[]>([]);
   const [pagination, setPagination] = useState<Page>({} as Page);
@@ -53,12 +47,31 @@ export default function Products() {
       setItemsPerPage(size || 10); // quantidade de item por página
       setProducts(resp.data.content);
       setPagination(resp.data); // Receber objeto referente a páginação
-    //   setFilter({
-    //     document: document || "",
-    //     corporateName: corporateName || ""
-    //   });
+      //   setFilter({
+      //     document: document || "",
+      //     corporateName: corporateName || ""
+      //   });
     } catch (error) {
       console.error("Error ao buscar dados produtos", error);
+    }
+  };
+
+  const getStockStatus = (product: any): any => {
+    switch (true) {
+      case product.stockQuantity === 0:
+        return (<Badge ml="1" colorScheme="red">
+          Esgotado
+        </Badge>);
+      case product.stockQuantity <= product.minimumStock:
+        return ( <Badge ml="1" colorScheme="yellow">
+          Abaixo do Mínimo
+        </Badge>);
+      default:
+        return (
+          <Badge ml="1" colorScheme="green">
+            Disponível
+          </Badge>
+        );
     }
   };
 
@@ -104,7 +117,7 @@ export default function Products() {
                   <Td>{e.stockQuantity}</Td>
                   <Td>{formatDate(new Date(e.expirationDate))}</Td>
                   <Td>{e.supplier.tradeName}</Td>
-                  <Td>{e.status}</Td>
+                  <Td>{getStockStatus(e)}</Td>
                   <Td textAlign="right">
                     <Tooltip label="Detalhe">
                       <IconButton
