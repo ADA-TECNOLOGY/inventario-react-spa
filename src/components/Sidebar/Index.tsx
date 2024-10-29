@@ -15,7 +15,7 @@ import { useAuth } from "../../hooks/auth";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import Header from "../Header";
 import { useState } from "react";
-import { MdList, MdOutlineContactPage, MdOutlineHome, MdOutlineInventory2, MdOutlinePersonAddAlt } from "react-icons/md";
+import { MdList, MdOutlineContactPage, MdOutlineHome, MdOutlineInventory2, MdOutlineNoteAlt, MdOutlinePersonAddAlt } from "react-icons/md";
 import { Linkhover } from "./style";
 import { Link } from "react-router-dom";
 
@@ -28,7 +28,10 @@ export default function Sidebar({ children }: any) {
     { name: "Categoria", link: "/category", icon: <MdList/> },
     { name: "Cliente", link: "/customer", icon: <MdOutlinePersonAddAlt /> },
     { name: "Produtos", link: "/products", icon: <MdOutlineInventory2  /> },
+  ]);
 
+  const [menusOrganizational] = useState([
+    { name: "Funções", link: "/position", icon: <MdOutlineNoteAlt/> },
   ]);
 
   return (
@@ -74,6 +77,19 @@ export default function Sidebar({ children }: any) {
                   </Box>
 
                   {menusRegister.map((e, index) => (
+                    <Linkhover as={Link} key={index} to={e.link}>
+                      <Flex alignItems={"center"}>
+                        {e.icon} 
+                        <Text ml={2}>{e.name}</Text> 
+                      </Flex>
+                    </Linkhover>
+                  ))}
+                  <Box mt={5} mb={3}>
+                    <Text color={'gray.600'} mb={2}>Organizacional</Text>
+                    <Divider bg={'gray.700'}/>
+                  </Box>
+
+                  {menusOrganizational.map((e, index) => (
                     <Linkhover as={Link} key={index} to={e.link}>
                       <Flex alignItems={"center"}>
                         {e.icon} 

@@ -15,6 +15,9 @@ import ValidateCode from "../pages/auth/ValidateCode";
 import { jwtDecode } from "jwt-decode";
 import Products from "../pages/Product";
 import CreateProduct from "../pages/Product/CreateProduct";
+import Position from "../pages/Positions";
+import CreatePosition from "../pages/Positions/CreatePosition";
+import EditPosition from "../pages/Positions/EditPosition";
 interface Props {
   children?: ReactNode;
 }
@@ -155,6 +158,33 @@ const RouteApp = () => {
         element={
           <ProtectedRoute>
             <CreateProduct />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/position"
+        element={
+          <ProtectedRoute>
+            <Position />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/position/create"
+        element={
+          <ProtectedRoute>
+            <CreatePosition />
+          </ProtectedRoute>
+        }
+      />
+
+    <Route
+        path="/position/edit/:id"
+        element={
+          <ProtectedRoute>
+            <EditPosition />
           </ProtectedRoute>
         }
       />
