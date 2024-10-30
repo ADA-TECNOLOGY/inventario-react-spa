@@ -109,7 +109,7 @@ export default function Customer() {
   // Responsavel por chamar dialog, de acordo com o escolhido ele traz a funcao de excluir la de cima
   const handleDelete = (id: number) => {
     Swal.fire({
-      text: "Deseja realmente deletar essa categoria?",
+      text: "Deseja realmente deletar esse cliente?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#00838F",
