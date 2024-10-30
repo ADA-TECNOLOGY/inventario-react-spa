@@ -31,19 +31,18 @@ import {
   import api from "../../../services/api";
   import Swal from "sweetalert2";
   import axios from "axios";
-import { EditCustomerFormData, editCustomerFormSchema } from "./formSchema";
 import { CustomerModel } from "../../../model/Customer.model";
 import { formatPhone } from '../../../util/formatPhone';
 import { formatPostalCode } from "../../../util/formatPostalCode";
 import { formatDocument } from "../../../util/formatDocument";
-import Supplier from "../../Supplier";
+import { CustomerFormData, customerFormSchema } from "../components/formSchema";
   
   export default function EditCustomer() {
     const [disableNumber, setDisableNumber] = useState<boolean>(false);
 
     const { register, control, handleSubmit, formState, getValues, setValue, resetField, clearErrors } =
-      useForm<EditCustomerFormData>({
-        resolver: yupResolver(editCustomerFormSchema(disableNumber)) as any,
+      useForm<CustomerFormData>({
+        resolver: yupResolver(customerFormSchema(disableNumber)) as any,
       });
   
     const [isLoading, setIsLoading] = useState(false);
@@ -80,7 +79,7 @@ import Supplier from "../../Supplier";
     }
 
     //funcao para salvar os novos dados editados
-    const handleUpdateCustomer: SubmitHandler<EditCustomerFormData> = useCallback(
+    const handleUpdateCustomer: SubmitHandler<CustomerFormData> = useCallback(
         async(values) => {
             setIsLoading(true)
             try{
@@ -92,9 +91,8 @@ import Supplier from "../../Supplier";
                 }
                 await api.put(`/customer/${id}`, formData)
                 Swal.fire({
-                    position:"top-end",
                     icon: "success",
-                    title:"Cliente cadastrado com sucesso!",
+                    title:"Cliente atualizado com sucesso!",
                     showConfirmButton: false,
                     timer: 1500,
                 })
@@ -117,7 +115,7 @@ import Supplier from "../../Supplier";
         setUfs(sortUfs); // Armazena os estados ordenados no estado 'ufs'
         setUfs(resp.data);
       } catch (error) {
-        console.error("Error ao buscar UF", error); // Captura e exibe um erro no console, caso ocorra
+        console.error("Error ao buscar UF", error); 
       }
     };
   
@@ -137,12 +135,11 @@ import Supplier from "../../Supplier";
         );
         setCities(sortedCities); // Atualiza o estado 'cities' com a lista de cidades ordenadas
       } catch (error) {
-        // Captura e exibe um erro no console, caso ocorra
         console.error("Error ao buscar Cidade", error);
       }
     };
   
-    //Funcao para pegar Cep (get)
+    //Funcao para pegar Cep
     const handlePostalCodeSearch = async (e: any) => {
       if (e.key === "Enter") {
         e.preventDefault();

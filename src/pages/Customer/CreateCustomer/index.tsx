@@ -19,8 +19,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { CreateCustomerFormData, createCustomerFormSchema, Address } from './formSchema';
-import { yupResolver } from "@hookform/resolvers/yup";
+
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -36,13 +35,15 @@ import {
 import api from "../../../services/api";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { CustomerFormData, customerFormSchema } from "../components/formSchema";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 export default function CreateCustomer() {
   const [disableNumber, setDisableNumber] = useState<boolean>(false)
 
   const { register, control, handleSubmit, formState, getValues, setValue, resetField, clearErrors } =
-    useForm<CreateCustomerFormData>({
-      resolver: yupResolver(createCustomerFormSchema(disableNumber)) as any,
+    useForm<CustomerFormData>({
+      resolver: yupResolver(customerFormSchema(disableNumber)) as any,
     });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -53,7 +54,7 @@ export default function CreateCustomer() {
   const navigate = useNavigate();
 
   //FUncao para salvar dados de cadastro
-  const handleCreateCustomer: SubmitHandler<CreateCustomerFormData> =
+  const handleCreateCustomer: SubmitHandler<CustomerFormData> =
     useCallback(async (values) => {
         setIsLoading(true)
         try{
