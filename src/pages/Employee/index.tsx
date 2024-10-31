@@ -139,7 +139,7 @@ export default function Employee() {
               {employee?.map((e: EmployeeModel) => (
                 <Tr key={e?.id} _hover={{ bg: "gray.100" }}>
                   <Td>{e.name}</Td>
-                  <Td>{e.functions}</Td>
+                  <Td>{e.position}</Td>
                   <Td>{formatPhone(e.phone)}</Td>
                   <Td>{e.email}</Td>
                   <Td mr={3} 

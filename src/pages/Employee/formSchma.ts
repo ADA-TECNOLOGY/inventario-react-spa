@@ -9,6 +9,7 @@ export const employeeFormSchema = (hasNoNumber: boolean) => {
         birthDate: yup.string().required("Campo obrigatório"),
         password: yup.string().required("Campo obrigatório"),
         confirmPassword: yup.string().required("Campo obrigatório"),
+        position: yup.string(),
         address: yup.object().shape({
             postalCode: yup.string().required("Campo obrigatório"),
             street: yup.string().required("Campo obrigatório"),
@@ -21,7 +22,7 @@ export const employeeFormSchema = (hasNoNumber: boolean) => {
             state: yup.string().required("Campo obrigatório"),
             city: yup.string().required("Campo obrigatório"),
             complement: yup.string(),
-            functions: yup.string(),
+            
         }),
     });
 }
@@ -35,7 +36,7 @@ export type Address = {
     complement: string;
     password: string;
     confirmPassword: string;
-    
+
 
 }
 
@@ -50,7 +51,7 @@ export type EmployeeFormData = {
     birthDate: string;
     password: string;
     confirmPassword: string
-    functions: string;
+    position: string;
 
 }
 
@@ -59,12 +60,12 @@ export const filterEmployeeFormSchema = yup.object().shape({
     document: yup.string(),
     active: yup.boolean(),
     id: yup.string(),
-  });
-  
+});
+
 export type FilterEmployeeFormData = {
     id: number;
     document: string;
     name: string;
     active: boolean;
-   
+
 }

@@ -3,7 +3,7 @@ import { AddressModel } from "./Address.model";
 export class EmployeeModel {
   id: number;
   document: string;
-  functions: string;
+  position: any;
   name: string;
   email: string;
   phone: string;
@@ -16,7 +16,7 @@ export class EmployeeModel {
   constructor(
     id: number,
     document: string,
-    functions: string,
+    position: any,
     name: string,
     email: string,
     phone: string,
@@ -36,6 +36,6 @@ export class EmployeeModel {
     this.address = address;
     this.password = password;
     this.confirmPassword = confirmPassword;
-    this.functions = functions
+    this.position = position
   }
 }
