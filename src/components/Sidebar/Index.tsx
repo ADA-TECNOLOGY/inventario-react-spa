@@ -15,7 +15,7 @@ import { useAuth } from "../../hooks/auth";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import Header from "../Header";
 import { useState } from "react";
-import { MdList, MdOutlineContactPage, MdOutlineHome, MdOutlineInventory2, MdOutlineNoteAlt, MdOutlinePersonAddAlt } from "react-icons/md";
+import { MdList, MdOutlineContactPage, MdOutlineHome, MdOutlineInventory2, MdOutlineManageAccounts, MdOutlineNoteAlt, MdOutlinePersonAddAlt } from "react-icons/md";
 import { Linkhover } from "./style";
 import { Link } from "react-router-dom";
 
@@ -32,6 +32,7 @@ export default function Sidebar({ children }: any) {
 
   const [menusOrganizational] = useState([
     { name: "Funções", link: "/position", icon: <MdOutlineNoteAlt/> },
+    {name: "Funcionário", link: "/employee", icon: <MdOutlineManageAccounts/>}
   ]);
 
   return (

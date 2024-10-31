@@ -35,7 +35,7 @@ import {
 import api from "../../../services/api";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { CustomerFormData, customerFormSchema } from "../components/formSchema";
+import { CustomerFormData, customerFormSchema } from "../formSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 export default function CreateCustomer() {

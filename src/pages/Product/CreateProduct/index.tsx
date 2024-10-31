@@ -10,7 +10,6 @@ import {
   Input,
   Select,
   SimpleGrid,
-  Text,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import Autocomplete from "../../../components/Autocomplete";
@@ -77,7 +76,7 @@ export default function CreateProduct() {
 
               <FormControl>
                 <FormLabel>Categoria</FormLabel>
-                <Select placeholder="Select option">
+                <Select placeholder="">
                   <option value="option1">Option 1</option>
                   <option value="option2">Option 2</option>
                   <option value="option3">Option 3</option>
@@ -92,7 +91,7 @@ export default function CreateProduct() {
             >
               <FormControl>
                 <FormLabel>Unidade de medida</FormLabel>
-                <Select placeholder="Select option">
+                <Select placeholder="">
                   <option value="option1">Option 1</option>
                   <option value="option2">Option 2</option>
                   <option value="option3">Option 3</option>
