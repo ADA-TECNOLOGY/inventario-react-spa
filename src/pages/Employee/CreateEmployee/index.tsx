@@ -13,6 +13,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { EmployeeModel } from "../../../model/Employee";
 import Autocomplete from "../../../components/Autocomplete";
+import { PositionModel } from "../../../model/Position.model";
 
 export default function CreateEmployee() {
     const [disableNumber, setDisableNumber] = useState<boolean>(false)
@@ -117,21 +118,21 @@ export default function CreateEmployee() {
         }
     }
 
-  /*const handleFilter = (e: any) => {
-    const functions = e;
-    const suggestions: any[] = [];
-
-    api.get(`employee/list?corporateName=${functions}`).then((resp) => {
-      resp.data.forEach((e: EmployeeModel) => {
-        const obj = {
-          id: e.id,
-          functions: e.functions,
-        };
-        suggestions.push(obj);
-      });
-    });
-    setFilteredSuggestions(suggestions);
-  };*/
+    const handleFilter = (e: any) => {
+        const name = e;
+        const suggestions: any[] = [];
+    
+        api.get(`position/list?name=${name}`).then((resp) => {
+          resp.data.forEach((e: PositionModel) => {
+            const obj = {
+              id: e.id,
+              name: e.name,
+            };
+            suggestions.push(obj);
+          });
+        });
+        setFilteredSuggestions(suggestions);
+      };
 
     useEffect(() => {
         dataState(); // Chama a função para buscar os estados
@@ -343,7 +344,8 @@ export default function CreateEmployee() {
                             <FormControl>
                                 <FormLabel>Funções</FormLabel>
                                 <Autocomplete
-                                   
+                                    handleFilter={handleFilter}
+                                    suggestions={filteredSuggestions}
                                 />
                                 
                             </FormControl>
