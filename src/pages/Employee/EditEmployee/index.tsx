@@ -1,3 +1,17 @@
+import { useCallback, useEffect, useState } from "react";
+import api from "../../../services/api";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { StateModel } from "../../../model/State.model";
+import { CitiesModel } from "../../../model/Cities.model";
+import { EmployeeModel } from "../../../model/Employee";
+import { Controller, SubmitHandler, useForm, useWatch } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { EmployeeFormData, employeeFormSchema } from "../formSchma";
+import { formatDocument } from "../../../util/formatDocument";
+import { formatPhone } from "../../../util/formatPhone";
+import { formatPostalCode } from "../../../util/formatPostalCode";
+import Swal from "sweetalert2";
+import axios from "axios";
 import {
   Box,
   Breadcrumb,
@@ -12,28 +26,16 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
-  RadioGroup,
   Select,
   SimpleGrid,
   Text,
 } from "@chakra-ui/react";
-import { Link, useNavigate } from "react-router-dom";
 import MaskedInput from "react-text-mask";
 import { cepMask, cpfMask, phoneNumberMask } from "../../../util/masksInput";
-import { EmployeeFormData, employeeFormSchema } from "../formSchma";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useCallback, useEffect, useState } from "react";
-import { StateModel } from "../../../model/State.model";
-import { CitiesModel } from "../../../model/Cities.model";
-import api from "../../../services/api";
-import Swal from "sweetalert2";
-import axios from "axios";
-import { EmployeeModel } from "../../../model/Employee";
 import Autocomplete from "../../../components/Autocomplete";
 import { PositionModel } from "../../../model/Position.model";
 
-export default function CreateEmployee() {
+export default function EditEmployee() {
   const [disableNumber, setDisableNumber] = useState<boolean>(false);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -56,8 +58,38 @@ export default function CreateEmployee() {
     resolver: yupResolver(employeeFormSchema(disableNumber)) as any,
   });
   const { errors } = formState;
+  const { id } = useParams();
+  const controlState = useWatch({ control, name: "address.state" });
 
-  const handleCreateEmployee: SubmitHandler<EmployeeFormData> = useCallback(
+  //Funcão que carrega os dados do funcionário por id
+  const getByEmployee = async () => {
+    try {
+      const resp = await api.get(`/employee/${id}`);
+      const employee = resp.data;
+      prepareFields(employee);
+    } catch (error) {
+      console.error("Error ao buscar dados", error);
+    }
+  };
+
+  const prepareFields = (employee: EmployeeModel) => {
+    setValue("name", employee.name);
+    setValue("document", formatDocument(employee.document));
+    setValue("email", employee.email);
+    setValue("phone", formatPhone(employee.phone));
+    setValue("birthDate", employee.birthDate);
+    setValue("address", employee.address);
+    setValue(
+      "address.postalCode",
+      formatPostalCode(employee.address.postalCode)
+    );
+    if (employee.address.number == null) {
+      setDisableNumber(true);
+    }
+  };
+
+  //Funcão para salvar os novos dados
+  const handleUpdateEmployee: SubmitHandler<EmployeeFormData> = useCallback(
     async (values) => {
       setIsLoading(true);
       try {
@@ -67,10 +99,10 @@ export default function CreateEmployee() {
           phone: values.phone.replace(/\D/g, ""),
           document: values.document.replace(/[.\-/() ]/g, ""),
         };
-        await api.post("employee", formData);
+        await api.put(`/employee/${id}`, formData);
         Swal.fire({
           icon: "success",
-          title: "Funcionário salvo com sucesso!",
+          title: "Funcionário atualizado com sucesso!",
           showConfirmButton: false,
           timer: 1500,
         });
@@ -78,13 +110,14 @@ export default function CreateEmployee() {
           navigate("/employee");
         }, 3000);
       } catch (error) {
-        console.error("Error ao tentar salvar funcionário", error);
+        console.error("Erro ao atualizar funcionário.", error);
       }
       setIsLoading(false);
     },
     []
   );
 
+  //usada para buscar ums lista de estado por UF de uma API
   const dataState = async () => {
     try {
       const resp = await axios.get("http://localhost:8080/state");
@@ -96,9 +129,11 @@ export default function CreateEmployee() {
     }
   };
 
+  //busca uma lista de cidades usando a API do IBGE(conforme a uf selecionada)
   const handleCity = async () => {
-    const state = getValues().address.state;
+    const state = getValues().address.state; //obtem o valor da UF selecionada no campo
     try {
+      // Faz uma requisição GET para a API do IBGE para buscar as cidades da UF selecionada
       const resp = await axios.get(
         `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${state}/municipios`
       );
@@ -110,11 +145,11 @@ export default function CreateEmployee() {
       );
       setCities(sortedCities); // Atualiza o estado 'cities' com a lista de cidades ordenadas
     } catch (error) {
-      // Captura e exibe um erro no console, caso ocorra
       console.error("Error ao buscar Cidade", error);
     }
   };
 
+  //Funcao para pegar Cep
   const handlePostalCodeSearch = async (e: any) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -163,9 +198,12 @@ export default function CreateEmployee() {
 
   useEffect(() => {
     dataState(); // Chama a função para buscar os estados
+    getByEmployee(); // chama a funcao de trazer os dados da tela
     setValue("address.city", getValues().address.city);
-  }, [cities, disableNumber]);
-console.log(errors)
+    if (controlState) {
+      handleCity();
+    }
+  }, [controlState]);
 
   return (
     <Box mb="2%">
@@ -181,7 +219,7 @@ console.log(errors)
       </Breadcrumb>
       <Card mt={5}>
         <CardBody textAlign={"center"}>
-          <Box as="form" onSubmit={handleSubmit(handleCreateEmployee)} mt={5}>
+          <Box as="form" onSubmit={handleSubmit(handleUpdateEmployee)} mt={5}>
             <SimpleGrid
               alignItems={"center"}
               columns={2}
@@ -420,7 +458,7 @@ console.log(errors)
             </SimpleGrid>
             <Flex justify="flex-end" padding="10px">
               <Button type="submit" colorScheme={"teal"} width={"15%"} mt={5}>
-                Salvar
+              Atualizar
               </Button>
             </Flex>
           </Box>

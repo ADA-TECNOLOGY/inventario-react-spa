@@ -1,15 +1,16 @@
 import * as yup from "yup";
+import { AddressModel } from "../../model/Address.model";
 
 export const employeeFormSchema = (hasNoNumber: boolean) => {
     return yup.object().shape({
         name: yup.string().required("Campo obrigatório"),
-        document: yup.object().required("Campo obrigatório"),
+        document: yup.string().required("Campo obrigatório"),
         email: yup.string().required("Campo obrigatório").email("E-mail inválido"),
         phone: yup.string().required("Campo obrigatório"),
         birthDate: yup.string().required("Campo obrigatório"),
         password: yup.string().required("Campo obrigatório"),
         confirmPassword: yup.string().required("Campo obrigatório"),
-        position: yup.string(),
+        position: yup.object(),
         address: yup.object().shape({
             postalCode: yup.string().required("Campo obrigatório"),
             street: yup.string().required("Campo obrigatório"),
@@ -26,19 +27,7 @@ export const employeeFormSchema = (hasNoNumber: boolean) => {
         }),
     });
 }
-export type Address = {
-    postalCode: string;
-    street: string;
-    number: string;
-    district: string;
-    city: string;
-    state: string;
-    complement: string;
-    password: string;
-    confirmPassword: string;
 
-
-}
 
 export type EmployeeFormData = {
     id?: number;
@@ -46,7 +35,7 @@ export type EmployeeFormData = {
     document: string;
     email: string;
     phone: string;
-    address: Address;
+    address: AddressModel;
     active?: boolean;
     birthDate: string;
     password: string;

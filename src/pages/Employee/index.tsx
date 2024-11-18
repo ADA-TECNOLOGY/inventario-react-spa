@@ -1,7 +1,7 @@
 import { Box, Button, Flex, Heading, IconButton, Spacer, Switch, Table, TableContainer, Tbody, Td, Th, Thead, Toast, Tooltip, Tr } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Page } from "../../model/interface/pagination.interface";
 import { MdCreate, MdDelete } from "react-icons/md";
 import Pagination from "../../components/PaginationGroupItems";
@@ -33,7 +33,7 @@ export default function Employee() {
       ) => {
         try {
           const resp = await api.get(
-            `/customer?page=${page}&size=${size}`
+            `/employee?page=${page}&size=${size}&name=${name ||  ""}`
           );
           setItemsPerPage(size || 10); // quantidade de item por página
           setEmployee(resp.data.content);
@@ -49,9 +49,9 @@ export default function Employee() {
       };
 
     //Funcao de desativar cliente
-  const enableDisableEmployee = async (idCustomer: number) => {
+  const enableDisableEmployee = async (idEmployee: number) => {
     try {
-      const resp = await api.patch(`/customer/disableOrActivate/${idCustomer}`);
+      const resp = await api.patch(`/employee/disableAndActive/${idEmployee}`);
       if (resp.status == 200) {
         Toast({
           description: `${
@@ -75,9 +75,9 @@ export default function Employee() {
     }
   };
 
-  // Funcao para deletar categoria
+
   const deleteEmployee = async (id: number) => {
-    await api.delete(`/category/${id}`);
+    await api.delete(`/employee/${id}`);
     handleDataEmployee(0, itemsPerPage);
     Swal.fire({
       text: "Deletado com sucesso.",
@@ -86,6 +86,13 @@ export default function Employee() {
       timer: 3000,
     });
   };
+
+  useEffect(() => {
+    handleDataEmployee(
+      0,
+      10,
+    );
+  }, []);
 
   // Responsavel por chamar dialog, de acordo com o escolhido ele traz a funcao de excluir la de cima
   const handleDelete = (id: number) => {
@@ -139,7 +146,7 @@ export default function Employee() {
               {employee?.map((e: EmployeeModel) => (
                 <Tr key={e?.id} _hover={{ bg: "gray.100" }}>
                   <Td>{e.name}</Td>
-                  <Td>{e.position}</Td>
+                  <Td>{e.position?.name}</Td>
                   <Td>{formatPhone(e.phone)}</Td>
                   <Td>{e.email}</Td>
                   <Td mr={3} 

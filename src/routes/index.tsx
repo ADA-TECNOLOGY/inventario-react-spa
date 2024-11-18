@@ -20,6 +20,7 @@ import CreatePosition from "../pages/Positions/CreatePosition";
 import EditPosition from "../pages/Positions/EditPosition";
 import Employee from "../pages/Employee";
 import CreateEmployee from "../pages/Employee/CreateEmployee";
+import EditEmployee from "../pages/Employee/EditEmployee";
 interface Props {
   children?: ReactNode;
 }
@@ -203,6 +204,14 @@ const RouteApp = () => {
         element={
           <ProtectedRoute>
             <CreateEmployee />
+          </ProtectedRoute>
+        }
+      />
+       <Route
+        path="/employee/:id"
+        element={
+          <ProtectedRoute>
+            <EditEmployee />
           </ProtectedRoute>
         }
       />
