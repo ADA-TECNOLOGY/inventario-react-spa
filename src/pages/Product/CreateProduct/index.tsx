@@ -39,6 +39,17 @@ export default function CreateProduct() {
   >([]);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<any[]>([]);
+
+  const handleCategory = async () => {
+    setIsLoading(true)
+    try {
+      const resp = await api.get("category/list")
+      setSelectedCategory (resp.data)
+    }catch(error) {
+      console.error("Error ao buscar dados",error)
+    }
+  }
 
   const handleFilter = (e: any) => {
     const corporateName = e;
@@ -56,7 +67,9 @@ export default function CreateProduct() {
     setFilteredSuggestions(suggestions);
   };
 
-  useEffect(() => {}, [filteredSuggestions]);
+  useEffect(() => {
+    handleCategory();
+  }, [filteredSuggestions]);
 
   return (
     <Box mb="2%" as="form" onSubmit={handleSubmit((data) => console.log(data))}>
@@ -101,10 +114,10 @@ export default function CreateProduct() {
               <FormControl isInvalid={!!errors.category}>
                 <FormLabel>Categoria</FormLabel>
                 <Select placeholder="" {...register("category")}>
-                  
-                  <option value="option1">Option 1</option>
-                  <option value="option2">Option 2</option>
-                  <option value="option3">Option 3</option>
+                  <option></option>
+                  {selectedCategory.map((e, index) => (
+                    <option key={index} >{e.name}</option>
+                  ))}
                 </Select>
                 {errors.category && (
                   <FormErrorMessage>{errors.category.message}</FormErrorMessage>
