@@ -105,7 +105,6 @@ export default function EditSupplier() {
         };
         await api.put(`/supplier/${id}`, formData);
         Swal.fire({
-          position: "top-end",
           icon: "success",
           title: "Fornecedor atualizado com sucesso!",
           showConfirmButton: false,

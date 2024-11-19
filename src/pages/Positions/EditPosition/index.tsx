@@ -52,7 +52,6 @@ import { Role } from "../../../model/Role.model";
           };
           await api.put(`position/${id}`, body);
           Swal.fire({
-              position:"top-end",
               icon: "success",
               title:"Função atualizada com sucesso!",
               showConfirmButton: false,
@@ -63,7 +62,6 @@ import { Role } from "../../../model/Role.model";
           }, 3000)
         } catch (error) {
           Swal.fire({
-              position:"top-end",
               icon: "error",
               title:"Erro",
               showConfirmButton: false,

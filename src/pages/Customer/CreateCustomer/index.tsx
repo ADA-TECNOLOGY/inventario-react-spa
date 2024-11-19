@@ -312,6 +312,13 @@ export default function CreateCustomer() {
                   </FormErrorMessage>
                 )}
               </FormControl>
+            </SimpleGrid>
+            <SimpleGrid
+              mt={3}
+              columns={4}
+              spacing={5}
+              templateColumns={"3fr 1fr 3fr 4fr"}
+            >
               <FormControl isInvalid={!!errors?.address?.district}>
                 <FormLabel>Bairro</FormLabel>
                 <Input id="address.district" {...register("address.district")} />
@@ -322,13 +329,6 @@ export default function CreateCustomer() {
 
                 )}
               </FormControl>
-            </SimpleGrid>
-            <SimpleGrid
-              mt={3}
-              columns={3}
-              spacing={5}
-              templateColumns={"1fr 4fr 6fr"}
-            >
               <FormControl isInvalid={!!errors?.address?.state}>
                 <FormLabel>UF</FormLabel>
                 <Select 

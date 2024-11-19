@@ -147,10 +147,11 @@ export default function Supplier() {
                   </Tooltip>
                   </Td>
                   <Td>
-                    <Tooltip label="Detalhe">
+                    <Tooltip label="Detalhes">
                       <IconButton
                         bg={"white"}
                         aria-label={"Detalhe"}
+                        onClick={() => navigate(`/supplier/${e.id}`)}
                         color={"teal"}
                         icon={<MdDehaze />}
                         mr={2}
