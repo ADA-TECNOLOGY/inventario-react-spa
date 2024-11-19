@@ -35,7 +35,7 @@ import { CustomerModel } from "../../../model/Customer.model";
 import { formatPhone } from '../../../util/formatPhone';
 import { formatPostalCode } from "../../../util/formatPostalCode";
 import { formatDocument } from "../../../util/formatDocument";
-import { CustomerFormData, customerFormSchema } from "../components/formSchema";
+import { CustomerFormData, customerFormSchema } from "../formSchema";
   
   export default function EditCustomer() {
     const [disableNumber, setDisableNumber] = useState<boolean>(false);

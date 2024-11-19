@@ -18,7 +18,7 @@ import {
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
 import { MdFilterList } from "react-icons/md";
-import { filterCostumerFormSchema, FilterCustomerFormData } from "./formSchema";
+import { filterCostumerFormSchema, FilterCustomerFormData } from "../formSchema";
 import MaskedInput from "react-text-mask";
 import { cpfMask } from "../../../util/masksInput";
 
