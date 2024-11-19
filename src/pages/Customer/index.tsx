@@ -96,7 +96,7 @@ export default function Customer() {
 
   // Funcao para deletar categoria
   const deleteCustomer = async (id: number) => {
-    await api.delete(`/category/${id}`);
+    await api.delete(`/customer/${id}`);
     handleDataCustomer(0, itemsPerPage);
     Swal.fire({
       text: "Deletado com sucesso.",

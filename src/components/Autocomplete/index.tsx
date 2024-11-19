@@ -17,7 +17,7 @@ export default function Autocomplete({ handleFilter, suggestions, setValue } : P
   const handleChange = (e: any): any => {
     const userInput = e.target.value;
     setQuery(userInput);
-    if (e.target.value.length >= 3) {
+    if (e.target.value.length > 1) {
       handleFilter(e.target.value);
 
       const filtered = suggestions.filter((suggestion: any) =>

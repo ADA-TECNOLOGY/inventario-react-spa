@@ -57,7 +57,7 @@ export default function Position() {
             <Thead>
               <Tr>
                 <Th>Nome</Th>
-                <Th display="flex" ml={9}>
+                <Th>
                   Ações
                 </Th>
               </Tr>
@@ -66,7 +66,7 @@ export default function Position() {
               {positions?.map((e: any) => (
                 <Tr key={e?.id} _hover={{ bg: "gray.100" }}>
                   <Td>{e.name}</Td>
-                  <Td textAlign="right">
+                  <Td>
                     <Tooltip label="Editar">
                       <IconButton
                         onClick={() => navigate(`/position/edit/${e.id}`)}

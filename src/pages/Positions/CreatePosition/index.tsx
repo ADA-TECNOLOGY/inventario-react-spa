@@ -49,7 +49,6 @@ export default function CreatePosition() {
         };
         await api.post("position", body);
         Swal.fire({
-            position:"top-end",
             icon: "success",
             title:"Função cadastrado com sucesso!",
             showConfirmButton: false,
@@ -60,7 +59,6 @@ export default function CreatePosition() {
         }, 3000)
       } catch (error) {
         Swal.fire({
-            position:"top-end",
             icon: "error",
             title:"Erro",
             showConfirmButton: false,
