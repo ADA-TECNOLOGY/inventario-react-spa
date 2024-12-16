@@ -18,6 +18,7 @@ export const productFormSchema: yup.SchemaOf<productFormData> = yup.object({
   purchasePrice: requiredNumber(),
   salePrice: requiredNumber(),
   observation: requiredString(),
+  typeUnitMeasure: requiredString(),
 });
 
 export type productFormData = {
@@ -33,4 +34,5 @@ export type productFormData = {
   purchasePrice: number;
   salePrice: number;
   observation: string;
+  typeUnitMeasure: string;
 };
