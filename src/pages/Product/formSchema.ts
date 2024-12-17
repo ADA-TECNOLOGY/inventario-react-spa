@@ -5,34 +5,32 @@ const requiredString = (message = "Campo obrigatório") => yup.string().required
 const requiredNumber = (message = "Campo obrigatório") => yup.number().required(message);
 
 
-export const productFormSchema: yup.SchemaOf<productFormData> = yup.object({
-  id: yup.number().required(),
+export const productFormSchema: yup.SchemaOf<ProductFormData> = yup.object({
   name: requiredString(),
-  supplier: requiredString(),
+  supplier: requiredNumber(),
   category: requiredString(),
   unitOfMeasure: requiredString(),
   stockQuantity: requiredNumber(),
   minimumStock: requiredNumber(),
   expirationDate: yup.string().optional(),
   batch: requiredString(),
-  purchasePrice: requiredNumber(),
-  salePrice: requiredNumber(),
-  observation: requiredString(),
+  purchasePrice: requiredString(),
+  salePrice: requiredString(),
+  observation: yup.string().optional(),
   typeUnitMeasure: requiredString(),
 });
 
-export type productFormData = {
-  id: number;
+export type ProductFormData = {
   name: string;
-  supplier: string;
+  supplier: number;
   category: string;
   unitOfMeasure: string;
   stockQuantity: number;
   minimumStock: number;
   expirationDate?: string ;
   batch: string;
-  purchasePrice: number;
-  salePrice: number;
-  observation: string;
+  purchasePrice: string;
+  salePrice: string;
+  observation?: string;
   typeUnitMeasure: string;
 };

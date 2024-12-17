@@ -14,16 +14,19 @@ import {
   Select,
   SimpleGrid,
 } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Autocomplete from "../../../components/Autocomplete";
 import api from "../../../services/api";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { SupplierModel } from "../../../model/Supplier.model";
 import ImageUpload from "../../../components/ImageUpload";
-import { useForm } from "react-hook-form";
-import { productFormData, productFormSchema } from "../formSchema";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { ProductFormData, productFormSchema } from "../formSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { lisUnitMeasure, typeUnitMeasure } from "../../../util/listUnitMeasure";
+import MaskedInput from "react-text-mask";
+import { currencyMask } from "../../../util/masksInput";
+import Swal from "sweetalert2";
 
 export default function CreateProduct() {
   const {
@@ -31,19 +34,57 @@ export default function CreateProduct() {
     handleSubmit,
     formState: { errors },
     setValue,
-  } = useForm<productFormData>({
+    control,
+  } = useForm<ProductFormData>({
     resolver: yupResolver(productFormSchema) as any,
   });
 
   const [filteredSuggestions, setFilteredSuggestions] = useState<
     Array<SupplierModel>
-  >([]);
+>([]);
 
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<any[]>([]);
   const [selectedListUnitMeasure] = useState<any[]>(lisUnitMeasure);
   const [selectedTypeUnitMeasure] = useState<any[]>(typeUnitMeasure);
   const [filterUnitMeasure, setFilterUnitMeasure] = useState<any[]>([]);
+
+  const handleCreateProducts: SubmitHandler<ProductFormData> = useCallback(
+    async (values) => {
+      try {
+        const formData = {
+          ...values,
+          purchasePrice: String(values.purchasePrice)
+            .replace(/\s/g, '') 
+            .replace('R$', '')
+            .replace(/\./g, '')
+            .replace(',', '.'),
+          salePrice: String(values.salePrice)
+          .replace(/\s/g, '')
+          .replace('R$', '')
+          .replace(/\./g, '')
+          .replace(',', '.'),
+          supplier: {
+            id: values.supplier,
+          }
+        }
+        await api.post("/product", formData);
+        Swal.fire({
+          icon: "success",
+          title: "Produto salvo com sucesso!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        setTimeout(() => {
+          navigate("/products");
+        }, 3000);
+      }catch (error) {
+        console.log("Erro ao enviar dados", error);
+        }
+    }
+ ,[] )
+
 
   const handleCategory = async () => {
     setIsLoading(true);
@@ -82,7 +123,7 @@ export default function CreateProduct() {
   }, [filteredSuggestions]);
 
   return (
-<Box mb="2%" as="form" onSubmit={handleSubmit((data) => console.log(data))}>
+<Box mt={5}>
   <Breadcrumb fontWeight="medium" fontSize="lg">
     <BreadcrumbItem>
       <BreadcrumbLink as={Link} to="/products">
@@ -96,8 +137,8 @@ export default function CreateProduct() {
 
   <Card mt={5}>
     <CardBody textAlign={"center"}>
-      <Box as="form" onSubmit={() => {}} mt="5">
-        <SimpleGrid
+    <Box as="form" onSubmit={handleSubmit(handleCreateProducts)} mt={5}>
+    <SimpleGrid
           mt={3}
           columns={{ base: 1, sm: 2, md: 2 }}
           spacing={3}
@@ -117,7 +158,7 @@ export default function CreateProduct() {
               {...register("supplier")}
               handleFilter={handleFilter}
               suggestions={filteredSuggestions}
-              setValue={(e: any) => setValue("supplier", e)}
+              setValue={(e: any) => setValue("supplier", e.id)}
             />
             {errors.supplier && (
               <FormErrorMessage>{errors.supplier.message}</FormErrorMessage>
@@ -234,7 +275,20 @@ export default function CreateProduct() {
           </FormControl>
           <FormControl isInvalid={!!errors.purchasePrice}>
             <FormLabel>Preço de compra</FormLabel>
-            <Input id="purchasePrice" {...register("purchasePrice")} />
+            <Controller
+                  name="purchasePrice"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      as={MaskedInput}
+                      mask={currencyMask}
+                      id="purchasePrice" {...register("purchasePrice")}
+                      guide={false}
+                      {...field}
+                    />
+                  )}
+                />
+
             {errors.purchasePrice && (
               <FormErrorMessage>
                 {errors.purchasePrice.message}
@@ -244,7 +298,19 @@ export default function CreateProduct() {
 
           <FormControl isInvalid={!!errors.salePrice}>
             <FormLabel>Preço de venda</FormLabel>
-            <Input id="salePrice" {...register("salePrice")} />
+            <Controller
+                  name="salePrice"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      as={MaskedInput}
+                      mask={currencyMask}
+                      guide={false}
+                      id="salePrice" {...register("salePrice")}
+                      {...field}
+                    />
+                  )}
+                />
             {errors.salePrice && (
               <FormErrorMessage>
                 {errors.salePrice.message}

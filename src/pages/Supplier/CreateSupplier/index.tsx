@@ -18,9 +18,8 @@ import {
   SimpleGrid,
   Stack,
 } from "@chakra-ui/react";
-import { yupResolver } from "@hookform/resolvers/yup"; // esquema de validacao
-import { Controller, SubmitHandler, useForm } from "react-hook-form"; // Hooks e funções do react-hook-form para gerenciamento de formulários.
-import { CreateSupplierFormData, createSupplierFormSchema } from "./formSchema";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useCallback, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -30,12 +29,13 @@ import { StateModel } from "../../../model/State.model";
 import { CitiesModel } from "../../../model/Cities.model";
 import MaskedInput from 'react-text-mask'
 import { cepMask, cnpjMask, cpfMask, phoneNumberMask } from "../../../util/masksInput";
+import { SupplierFormData, supplierFormSchema } from "../formSchema";
 
 export default function CreateSupplier() {
   const [disableNumber, setDisableNumber] = useState<boolean>(false)
   const { register, control, handleSubmit, formState, getValues, setValue, clearErrors } =
-    useForm<CreateSupplierFormData>({
-      resolver: yupResolver(createSupplierFormSchema(disableNumber)) as any,
+    useForm<SupplierFormData>({
+      resolver: yupResolver(supplierFormSchema(disableNumber)) as any,
     });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +47,7 @@ export default function CreateSupplier() {
   const navigate = useNavigate();
 
   //Salva o dados do fornecedor
-  const handleCreateSupplier: SubmitHandler<CreateSupplierFormData> =
+  const handleCreateSupplier: SubmitHandler<SupplierFormData> =
     useCallback(async (values) => {
       setIsLoading(true);
       try {

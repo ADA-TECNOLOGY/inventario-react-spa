@@ -2668,7 +2668,7 @@ invariant@^2.2.4:
     axios "^1.7.2"
     framer-motion "^11.2.11"
     install "^0.13.0"
-    inventario-react-spa "file:../../../.cache/yarn/v6/npm-inventario-react-spa-0.0.0-b7263d2e-b09b-4cf7-86f3-38dabe72b6ee-1730231275725/node_modules/inventario-react-spa"
+    inventario-react-spa "file:../../../../../.cache/yarn/v6/npm-inventario-react-spa-0.0.0-06f26202-112d-49f3-8f3a-d478ce8f1e86-1734460826550/node_modules/inventario-react-spa"
     jwt-decode "^4.0.0"
     react "^18.3.1"
     react-dom "^18.3.1"
@@ -3457,6 +3457,11 @@ sweetalert2@^11.12.1:
   version "11.12.3"
   resolved "https://registry.npmjs.org/sweetalert2/-/sweetalert2-11.12.3.tgz"
   integrity sha512-tgGJSgfSV/xK113JEvhjwqKAuBYLXsZf0z+tGlHKQNnsLMi4eSNuzn9tt5hUdvjOVTLSPDgo0Lc+tnjy9Uj7Og==
+
+text-mask-addons@^3.8.0:
+  version "3.8.0"
+  resolved "https://registry.yarnpkg.com/text-mask-addons/-/text-mask-addons-3.8.0.tgz#17b61ef665a4f36811f2ea1f01a223b4be61ab26"
+  integrity sha512-VSZSdc/tKn4zGxgpJ+uNBzoW1t472AoAFIlbw1K7hSNXz0DfSBYDJNRxLqgxOfWw1BY2z6DQpm7g0sYZn5qLpg==
 
 text-table@^0.2.0:
   version "0.2.0"

@@ -20,7 +20,6 @@ import {
 } from "@chakra-ui/react";
 import { Controller, SubmitHandler, useForm, useWatch } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { EditSupplierFormData, editSupplierFormSchema } from "./formSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useCallback, useEffect, useState } from "react";
 import api from "../../../services/api";
@@ -39,6 +38,7 @@ import { SupplierModel } from "../../../model/Supplier.model";
 import { formatPostalCode } from "../../../util/formatPostalCode";
 import { formatPhone } from "../../../util/formatPhone";
 import { formatDocument } from "../../../util/formatDocument";
+import { SupplierFormData, supplierFormSchema } from "../formSchema";
 
 export default function EditSupplier() {
   const [disableNumber, setDisableNumber] = useState<boolean>(false);
@@ -52,8 +52,8 @@ export default function EditSupplier() {
     clearErrors,
     resetField,
     
-  } = useForm<EditSupplierFormData>({
-    resolver: yupResolver(editSupplierFormSchema(disableNumber)) as any,
+  } = useForm<SupplierFormData>({
+    resolver: yupResolver(supplierFormSchema(disableNumber)) as any,
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -93,7 +93,7 @@ export default function EditSupplier() {
   };
 
   //Salva o dados do fornecedor
-  const handleUpdateSupplier: SubmitHandler<EditSupplierFormData> = useCallback(
+  const handleUpdateSupplier: SubmitHandler<SupplierFormData> = useCallback(
     async (values) => {
       setIsLoading(true);
       try {
