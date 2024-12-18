@@ -27,7 +27,7 @@ export default function Sidebar({ children }: any) {
     { name: "Fonecedor", link: "/supplier", icon: <MdOutlineContactPage/> },
     { name: "Categoria", link: "/category", icon: <MdList/> },
     { name: "Cliente", link: "/customer", icon: <MdOutlinePersonAddAlt /> },
-    { name: "Produtos", link: "/products", icon: <MdOutlineInventory2  /> },
+    { name: "Produtos", link: "/product", icon: <MdOutlineInventory2  /> },
   ]);
 
   const [menusOrganizational] = useState([
