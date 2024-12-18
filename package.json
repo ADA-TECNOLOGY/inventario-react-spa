@@ -32,6 +32,7 @@
     "react-text-mask": "^5.5.0",
     "styled-components": "^6.1.12",
     "sweetalert2": "^11.12.1",
+    "text-mask-addons": "^3.8.0",
     "yup": "^0.32.9"
   },
   "devDependencies": {

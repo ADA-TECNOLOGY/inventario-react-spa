@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-export const createSupplierFormSchema = (hasNoNumber: boolean) => {
+export const supplierFormSchema = (hasNoNumber: boolean) => {
   return yup.object().shape({
     document: yup.string().required("Campo obrigatório"),
     corporateName: yup.string().required("Campo obrigatório"),
@@ -35,7 +35,7 @@ export type  Address = {
   
 }
 
-export type  CreateSupplierFormData = {
+export type  SupplierFormData = {
   id: number;
   document: string;
   corporateName: string;
