@@ -20,7 +20,7 @@ import api from "../../../services/api";
 import { useCallback, useEffect, useState } from "react";
 import { SupplierModel } from "../../../model/Supplier.model";
 import ImageUpload from "../../../components/ImageUpload";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm, useWatch } from "react-hook-form";
 import { ProductFormData, productFormSchema } from "../formSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { lisUnitMeasure, typeUnitMeasure } from "../../../util/listUnitMeasure";
@@ -36,6 +36,7 @@ export default function EditProduct() {
     handleSubmit,
     formState: { errors },
     setValue,
+    getValues,
     control,
   } = useForm<ProductFormData>({
     resolver: yupResolver(productFormSchema) as any,
@@ -52,34 +53,49 @@ export default function EditProduct() {
   const [selectedListUnitMeasure] = useState<any[]>(lisUnitMeasure);
   const [selectedTypeUnitMeasure] = useState<any[]>(typeUnitMeasure);
   const [filterUnitMeasure, setFilterUnitMeasure] = useState<any[]>([]);
+  const controlTypeUnitMeasure = useWatch({ control, name: "typeUnitMeasure" });
+
 
   // Função para trazer os dados salvos na tela
   const getByProduct = async () => {
     try {
       const resp = await api.get(`product/${id}`);
       const product = resp.data;
-      console.log(product)
       prepareFields(product);
     } catch (error) {
       console.error("Erro ao buscar dados", error);
     }
   };
 
-  const prepareFields = (product: ProductModel) => {
+  const prepareFields = async (product: ProductModel) => {
     setValue("name", product.name);
     setValue("supplier", product.supplier);
     setValue("category", product.category);
-    setValue("unitOfMeasure", product.unitOfMeasure);
     setValue("stockQuantity", product.stockQuantity);
     setValue("minimumStock", product.minimumStock);
-    setValue("expirationDate", product.expirationDate);
+    setValue("expirationDate", product.expirationDate || "") ;
     setValue("batch", product.batch);
     setValue("purchasePrice", formatCurrency(product.purchasePrice));
     setValue("salePrice", formatCurrency(product.salePrice));
     setValue("observation", product.observation);
     setValue("typeUnitMeasure", product.typeUnitMeasure);
-  };
+  
+    // Definir o valor para unitOfMeasure depois de processar o typeUnitMeasure
+    setValue("unitOfMeasure", product.unitOfMeasure);
+  };  
 
+  const handleCategory = async () => {
+    setIsLoading(true);
+    try {
+      const resp = await api.get("category/list");
+      console.log(resp.data)
+      setSelectedCategory(resp.data);
+    } catch (error) {
+      console.error("Error ao buscar dados", error);
+    }
+    setIsLoading(false);
+  };
+  
   const handleCreateProducts: SubmitHandler<ProductFormData> = useCallback(
     async (values) => {
       try {
@@ -116,16 +132,7 @@ export default function EditProduct() {
     []
   );
 
-  const handleCategory = async () => {
-    setIsLoading(true);
-    try {
-      const resp = await api.get("category/list");
-      setSelectedCategory(resp.data);
-    } catch (error) {
-      console.error("Error ao buscar dados", error);
-    }
-    setIsLoading(false);
-  };
+  
 
   const handlefilteUnitMeasure = (e: any) => {
     const filter = selectedListUnitMeasure.filter((unit) => unit.type == e);
@@ -149,9 +156,15 @@ export default function EditProduct() {
   };
 
   useEffect(() => {
+    getByProduct()
     handleCategory();
-    getByProduct();
-  }, [filteredSuggestions]);
+
+    if(controlTypeUnitMeasure){
+      handlefilteUnitMeasure(controlTypeUnitMeasure)
+      setValue("unitOfMeasure", getValues().unitOfMeasure);
+
+    }
+  }, [controlTypeUnitMeasure]);
 
   return (
     <Box mt={5}>
@@ -202,7 +215,10 @@ export default function EditProduct() {
 
               <FormControl isInvalid={!!errors.category}>
                 <FormLabel>Categoria</FormLabel>
-                <Select placeholder="" {...register("category")}>
+                <Select onClick={(e) => handleCategory(e.target.value)}
+                  placeholder=""
+                  {...register("category")}
+                >
                   <option></option>
                   {selectedCategory.map((e, index) => (
                     <option key={index}>{e.name}</option>

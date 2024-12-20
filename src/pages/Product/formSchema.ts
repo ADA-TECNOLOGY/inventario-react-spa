@@ -27,7 +27,7 @@ export type ProductFormData = {
   unitOfMeasure: string;
   stockQuantity: number;
   minimumStock: number;
-  expirationDate?: string ;
+  expirationDate?: string  ;
   batch: string;
   purchasePrice: string;
   salePrice: string;
