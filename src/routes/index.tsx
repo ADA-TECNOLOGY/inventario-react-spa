@@ -21,6 +21,7 @@ import EditPosition from "../pages/Positions/EditPosition";
 import Employee from "../pages/Employee";
 import CreateEmployee from "../pages/Employee/CreateEmployee";
 import EditEmployee from "../pages/Employee/EditEmployee";
+import EditProduct from "../pages/Product/EditProduct";
 interface Props {
   children?: ReactNode;
 }
@@ -148,7 +149,7 @@ const RouteApp = () => {
       />
 
       <Route
-        path="/products"
+        path="/product"
         element={
           <ProtectedRoute>
             <Products />
@@ -157,10 +158,18 @@ const RouteApp = () => {
       />
 
       <Route
-        path="/products/create"
+        path="/product/create"
         element={
           <ProtectedRoute>
             <CreateProduct />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/product/:id"
+        element={
+          <ProtectedRoute>
+            <EditProduct />
           </ProtectedRoute>
         }
       />

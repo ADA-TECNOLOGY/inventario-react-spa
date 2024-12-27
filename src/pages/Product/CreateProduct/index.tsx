@@ -77,7 +77,7 @@ export default function CreateProduct() {
           timer: 1500,
         });
         setTimeout(() => {
-          navigate("/products");
+          navigate("/product");
         }, 3000);
       }catch (error) {
         console.log("Erro ao enviar dados", error);
@@ -126,7 +126,7 @@ export default function CreateProduct() {
 <Box mt={5}>
   <Breadcrumb fontWeight="medium" fontSize="lg">
     <BreadcrumbItem>
-      <BreadcrumbLink as={Link} to="/products">
+      <BreadcrumbLink as={Link} to="/product">
         Produtos
       </BreadcrumbLink>
     </BreadcrumbItem>

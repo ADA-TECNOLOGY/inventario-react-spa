@@ -5,7 +5,6 @@ import {
   Heading,
   IconButton,
   Spacer,
-  Switch,
   Table,
   TableContainer,
   Tbody,
@@ -22,10 +21,6 @@ import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { Page } from "../../model/interface/pagination.interface";
 import Pagination from "../../components/PaginationGroupItems";
-import { formatDocument } from "../../util/formatDocument";
-import { formatPhone } from "../../util/formatPhone";
-import { SupplierModel } from "../../model/Supplier.model";
-import { formatTime } from "../../util/formatTime";
 import { formatDate } from "../../util/formatDate";
 
 interface FildsFilter {
@@ -77,7 +72,7 @@ export default function Products() {
           colorScheme="teal"
           variant="outline"
           ml={2}
-          onClick={() => navigate("/products/create")}
+          onClick={() => navigate("/product/create")}
         >
           Novo +{" "}
         </Button>
@@ -117,7 +112,7 @@ export default function Products() {
                     </Tooltip>
                     <Tooltip label="Editar">
                       <IconButton
-                        onClick={() => navigate(`/supplier/${e.id}`)}
+                        onClick={() => navigate(`/product/${e.id}`)}
                         bg={"white"}
                         aria-label={"Editar"}
                         color={"teal"}
